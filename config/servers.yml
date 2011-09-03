@@ -1,0 +1,29 @@
+    -   #login server (custom made)
+        type: login
+        host: 127.0.0.1
+        port: 7780
+        pass: a password here
+
+    -   #database server (e.g. mysql)
+        type: database
+        host: 127.0.0.1
+        port: 7781
+        pass: a password here
+        other:
+            openjpa.ConnectionDriverName: org.hsqldb.jdbcDriver
+            openjpa.ConnectionURL: jdbc:hsqldb:{configDir}/database/database.db
+            openjpa.Log: DefaultLevel=WARN, Tool=INFO
+            openjpa.ConnectionUserName: SA
+            openjpa.ConnectionPassword: ""
+            openjpa.jdbc.SynchronizeMappings: buildSchema
+
+    -   #content server (e.g. apache2)
+        type: content
+        host: 127.0.0.1
+        port: 7782
+
+    -   #processing server (custom made)
+        type: processing
+        host: 127.0.0.1
+        port: 7783
+        pass: a password here
