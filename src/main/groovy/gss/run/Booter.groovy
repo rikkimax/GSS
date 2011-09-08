@@ -121,4 +121,8 @@ class Booter {
     EntityManager getEntityManager() {
         return entityManager;
     }
+
+    Session getSession() {
+        return sessionFactory.openSession();
+    }
 }
