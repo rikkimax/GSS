@@ -10,12 +10,18 @@
         port: 7781
         pass: a password here
         other:
-            openjpa.ConnectionDriverName: org.hsqldb.jdbcDriver
-            openjpa.ConnectionURL: jdbc:hsqldb:{configDir}/database/database.db
-            openjpa.Log: DefaultLevel=WARN, Tool=INFO
-            openjpa.ConnectionUserName: SA
-            openjpa.ConnectionPassword: ""
-            openjpa.jdbc.SynchronizeMappings: buildSchema
+            hibernate.connection.driver_class: org.hsqldb.jdbcDriver
+            hibernate.connection.url: jdbc:hsqldb:{configDir}/database/database.db
+            hibernate.connection.username: "SA"
+            hibernate.connection.password: ""
+            hibernate.dialect: org.hibernate.dialect.HSQLDialect
+            hibernate.current_session_context_class: thread
+            hibernate.transaction.factory_class: org.hibernate.transaction.JDBCTransactionFactory
+            hibernate.cache.provider_class: org.hibernate.cache.NoCacheProvider
+            hibernate.connection.pool_size: 1
+            hibernate.connection.autocommit: true
+            hibernate.hbm2ddl.auto: create-drop
+            hibernate.show_sql: true
 
     -   #content server (e.g. apache2)
         type: content
