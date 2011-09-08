@@ -107,22 +107,10 @@ class Booter {
         if (configH.get("hibernate.connection.url") != null) {
             //database url exists, otherwise we can't work...
             Logger.getLogger(Booter.getClass().getName()).info("Using database connection: " + configH.get("openjpa.ConnectionURL"));
-            AnnotationConfiguration ac = new AnnotationConfiguration();
             for (String key: configH.keySet()) {
-                ac.setProperty(key, configH.get(key));
+                config.getAnnotationConfiguration().setProperty(key, configH.get(key));
             }
-            ac.addAnnotatedClass(Test);
-            sessionFactory = ac.buildSessionFactory();
-
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            session.save(new Test(test:"hmm haha"));
-            transaction.commit();
-            session.close();
-            session = sessionFactory.openSession();
-            transaction = session.beginTransaction();
-            println(session.find("from Test"));
-            session.close();
+            sessionFactory = config.getAnnotationConfiguration().buildSessionFactory();
         }
     }
 

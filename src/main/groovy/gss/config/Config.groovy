@@ -31,10 +31,13 @@ import yaml.handling.Yaml2
 
 import org.apache.commons.vfs.FileObject
 import org.apache.commons.vfs.VFS
+import org.hibernate.cfg.AnnotationConfiguration
+import java.util.logging.Logger
 
 class Config {
     private FileObject directory;
     private ArrayList<gss.config.Server> servers;
+    private AnnotationConfiguration annotationConfiguration;
 
     void setDirectory(File directory) {
         if (directory.isDirectory() && directory.exists()) {
@@ -51,9 +54,26 @@ class Config {
         //does it need to be dynamic?
         Yaml2 yaml = new Yaml2();
         servers = yaml.load(directory.resolveFile("servers.yml").getContent().getInputStream(), Server.class);
+        Map common = yaml.load(directory.resolveFile("common.yml").getContent().getInputStream());
+        //lets dyanamically set which classes will be used for the database
+        List serializedClasses = common.get("SerializedClasses");
+        setupHibernateFactory(serializedClasses);
     }
 
     ArrayList<gss.config.Server> getServers() {
         return servers;
+    }
+
+    void setupHibernateFactory(List serializedClasses) {
+        annotationConfiguration = new AnnotationConfiguration();
+        for (String s: serializedClasses) {
+            Class clasz = Eval.me("return " + s + ".class;");
+            Logger.getLogger(this.getClass().getName()).info("Adding class " + clasz + " to annotated list");
+            annotationConfiguration.addAnnotatedClass(clasz);
+        }
+    }
+
+    AnnotationConfiguration getAnnotationConfiguration() {
+        return annotationConfiguration;
     }
 }
