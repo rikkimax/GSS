@@ -34,19 +34,15 @@ import java.util.logging.Logger
 import javax.persistence.EntityManager
 import joptsimple.OptionParser
 import joptsimple.OptionSet
-import gss.run.entities.JPAEntity
-import org.hibernate.cfg.AnnotationConfiguration
 import org.hibernate.SessionFactory
 import org.hibernate.Session
-import org.hibernate.Transaction
-import gss.run.entities.Test
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import gss.socket.ServerSocket
 
 class Booter {
     private static Boolean run = true;
     private static Config config;
     private static SessionFactory sessionFactory;
+    private static Servers servers;
 
     static void main(String... args) {
         Logger.getLogger("gss.run").setLevel(Level.ALL);
@@ -86,6 +82,8 @@ class Booter {
     static void startup() {
         if (run)
             startUpDataBase();
+        if (run)
+            startUpServers();
 
     }
 
@@ -104,7 +102,9 @@ class Booter {
                 configH.put(key, database.getOther().get(key).toString().replace("{configDir}", config.getDirectory().getURL().toString()));
             }
         }
-        if (configH.get("hibernate.connection.url") != null) {
+        if (configH.get("hibernate.connection.url") == null) {
+            run = false;
+        } else {
             //database url exists, otherwise we can't work...
             Logger.getLogger(Booter.getClass().getName()).info("Using database connection: " + configH.get("openjpa.ConnectionURL"));
             for (String key: configH.keySet()) {
@@ -114,15 +114,48 @@ class Booter {
         }
     }
 
-    Config getConfig() {
+    static void startUpServers() {
+        //find current server details from config
+        servers = new Servers();
+        Server current;
+        HashMap configH = new HashMap();
+        for (Server server: config.getServers()) {
+            if (server.getType().toLowerCase().equals("current")) {
+                current = server;
+            }
+        }
+        HashMap<ArrayList<HashMap<Object, Object>>> serversConfig = current.other?.get("servers");
+        for (String serverClass: serversConfig.keySet()) {
+            ArrayList<HashMap<Object, Object>> values = serversConfig.get(serverClass);
+            Class serverClassReflected = Eval.me("return " + serverClass + ".class");
+            println(serverClassReflected);
+            if (serverClassReflected != null) {
+                if (serverClassReflected.newInstance() instanceof ServerSocket) {
+                    for (HashMap<Object> serverValue: values) {
+                        ServerSocket serverConnector = serverClassReflected.newInstance();
+                        serverConnector.setValues(values);
+                        servers.addSocket(serverConnector);
+                    }
+                }
+            }
+        }
+        servers.start();
+    }
+
+    static Config getConfig() {
         return config;
     }
 
-    EntityManager getEntityManager() {
+    static EntityManager getEntityManager() {
         return entityManager;
     }
 
-    Session getSession() {
+    static Session getSession() {
+        //give us a new session that is opened so we can work with the database
         return sessionFactory.openSession();
+    }
+
+    static Servers getServers() {
+        return servers;
     }
 }

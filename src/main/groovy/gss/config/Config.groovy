@@ -33,11 +33,13 @@ import org.apache.commons.vfs.FileObject
 import org.apache.commons.vfs.VFS
 import org.hibernate.cfg.AnnotationConfiguration
 import java.util.logging.Logger
+import com.esotericsoftware.kryo.Kryo
 
 class Config {
     private FileObject directory;
     private ArrayList<gss.config.Server> servers;
     private AnnotationConfiguration annotationConfiguration;
+    private Kryo kryo;
 
     void setDirectory(File directory) {
         if (directory.isDirectory() && directory.exists()) {
@@ -65,9 +67,11 @@ class Config {
     }
 
     void setupHibernateFactory(List serializedClasses) {
+        kryo = new Kryo();
         annotationConfiguration = new AnnotationConfiguration();
         for (String s: serializedClasses) {
             Class clasz = Eval.me("return " + s + ".class;");
+            kryo.register(clasz);
             Logger.getLogger(this.getClass().getName()).info("Adding class " + clasz + " to annotated list");
             annotationConfiguration.addAnnotatedClass(clasz);
         }
@@ -75,5 +79,9 @@ class Config {
 
     AnnotationConfiguration getAnnotationConfiguration() {
         return annotationConfiguration;
+    }
+
+    Kryo getKryo() {
+        return kryo;
     }
 }
