@@ -1,14 +1,26 @@
+    -   #This server
+        type: current
+        host: 127.0.0.1 # we ignore this...
+        port: -1 # we ignore this...
+        pass: # we ignore this...
+        other:
+            servers:
+                gss.run.servers.connectors.KryoNetServer:
+                        -
+                            port: 100
+                # gss.run.servers.connectors.Plain:
+
     -   #login server (custom made)
         type: login
         host: 127.0.0.1
         port: 7780
-        pass: a password here
+        pass: #a password here
 
     -   #database server (e.g. mysql)
         type: database
         host: 127.0.0.1
         port: 7781
-        pass: a password here
+        pass: #a password here
         other:
             hibernate.connection.driver_class: org.hsqldb.jdbcDriver
             hibernate.connection.url: jdbc:hsqldb:{configDir}/database/database.db
@@ -27,9 +39,10 @@
         type: content
         host: 127.0.0.1
         port: 7782
+        pass: #a password here
 
     -   #processing server (custom made)
         type: processing
         host: 127.0.0.1
         port: 7783
-        pass: a password here
+        pass: #a password here
