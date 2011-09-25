@@ -82,7 +82,7 @@ class KryoNetServer extends ServerSocket {
         server.removeListener(clojureReceived);
     }
 
-    protected void received(Connection connection, Object object) {
+    protected void received(Connection connection, Object message) {
         KryoNetClient kryoNetClient = new KryoNetClient(this, connection);
 
     }

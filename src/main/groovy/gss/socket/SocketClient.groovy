@@ -61,4 +61,6 @@ public class SocketClient {
     ServerSocket getServerSocket() {
         return serverSocket;
     }
+
+    Long getTimeReceived() {};
 }

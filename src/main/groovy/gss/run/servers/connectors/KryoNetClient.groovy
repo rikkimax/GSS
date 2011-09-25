@@ -30,13 +30,16 @@ package gss.run.servers.connectors
 import gss.socket.SocketClient
 import com.esotericsoftware.kryonet.Connection
 import gss.socket.ServerSocket
+import org.apache.commons.lang.StringUtils
 
 class KryoNetClient extends SocketClient {
     private Connection connection;
+    private Long receivedTime;
 
     KryoNetClient(KryoNetServer serverSocket, Connection connection) {
         super(serverSocket);
         this.connection = connection;
+        receivedTime = System.currentTimeMillis();
     }
 
     String getIP() {
@@ -62,7 +65,9 @@ class KryoNetClient extends SocketClient {
      */
     String getID() {
         String ip = getIP().replace(".", "");
-        return (getPort() + "." + ip);
+        ipPort = getPort() + "." + ip;
+        ipPort = StringUtils.reverse(ipPort);
+        return ipPort;
     }
 
     ServerSocket getServerSocket() {
@@ -71,5 +76,9 @@ class KryoNetClient extends SocketClient {
 
     void sendMessage(Object message) {
         connection.sendTCP(message);
+    }
+
+    Long getTimeReceived() {
+        return receivedTime;
     }
 }
