@@ -46,11 +46,19 @@ class KryoNetServer extends ServerSocket {
     }
 
     synchronized SocketClient getClient(String id) {
-        KryoNetClient[] clients = getClients();
-        for (KryoNetClient client: clients) {
-            if (client.getID() == id)
-                return client;
+        getClients().each() {
+            if (it.getID() == id)
+                return it;
         }
+        return null;
+    }
+
+    synchronized Boolean clientConnected(String id) {
+        getClients().each() {
+            if (it.getID() == id)
+                return true;
+        }
+        return false;
     }
 
     synchronized void setValues(HashMap<Object, Object> values) {
