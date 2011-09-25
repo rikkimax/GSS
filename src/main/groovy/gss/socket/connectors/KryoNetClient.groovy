@@ -25,7 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package gss.run.servers.connectors
+package gss.socket.connectors
 
 import gss.socket.SocketClient
 import com.esotericsoftware.kryonet.Connection
