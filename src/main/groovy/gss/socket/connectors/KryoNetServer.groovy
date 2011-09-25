@@ -53,7 +53,7 @@ class KryoNetServer extends ServerSocket {
         return null;
     }
 
-    synchronized Boolean clientConnected(String id) {
+    synchronized Boolean isClientConnected(String id) {
         getClients().each() {
             if (it.getID() == id)
                 return true;
