@@ -25,41 +25,18 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package gss.run
 
-import gss.socket.ServerSocket;
 
-class Servers {
-    private ArrayList<ServerSocket> sockets = new ArrayList<ServerSocket>();
+package gss.run;
 
-    void addSocket(ServerSocket serverSocket) {
-        sockets.add(serverSocket);
-    }
 
-    void removeSocket(ServerSocket serverSocket) {
-        sockets.remove(serverSocket);
-        serverSocket.stop();
-    }
+import org.junit.Test
 
-    ArrayList<ServerSocket> getSockets() {
-        return sockets;
-    }
+public class LoginTest {
 
-    void clear() {
-        for (ServerSocket serverSocket: sockets) {
-            removeSocket(serverSocket);
-        }
-    }
-
-    void start() {
-        for (ServerSocket serverSocket: sockets) {
-            serverSocket.start();
-        }
-    }
-
-    void stop() {
-        for (ServerSocket serverSocket: sockets) {
-            serverSocket.stop();
-        }
+    @Test
+    public void testHelp() {
+        Login.main("");
+        Login.main("--help");
     }
 }

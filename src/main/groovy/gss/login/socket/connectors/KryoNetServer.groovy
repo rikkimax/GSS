@@ -25,16 +25,16 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package gss.socket.connectors
+package gss.login.socket.connectors
 
-import gss.socket.ServerSocket
-import gss.socket.SocketClient
+import gss.login.socket.ServerSocket
+import gss.login.socket.SocketClient
 import com.esotericsoftware.kryonet.Server
-import gss.run.Booter
+import gss.run.Login
 import com.esotericsoftware.kryonet.Connection
 
 class KryoNetServer extends ServerSocket {
-    Server server = new Server(16384, 2048, Booter.getConfig().getKryo());
+    Server server = new Server(16384, 2048, Login.getConfig().getKryo());
     private def clojureReceived = Eval.x(this, "return new com.esotericsoftware.kryonet.Listener() {public void received(com.esotericsoftware.kryonet.Connection connection, Object object) {x.received(connection, object);}};");
 
     synchronized SocketClient[] getClients() {
@@ -78,7 +78,7 @@ class KryoNetServer extends ServerSocket {
             server.bind(tcp);
         else
         //we are invalid so lets remove it from list...
-            Booter.getServers().removeSocket(this);
+            Login.getServers().removeSocket(this);
     }
 
     synchronized void start() {

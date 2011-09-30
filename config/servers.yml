@@ -5,7 +5,7 @@
         pass: # we ignore this...
         other:
             servers:
-                gss.socket.connectors.KryoNetServer:
+                gss.login.socket.connectors.KryoNetServer:
                         -
                             port: 100
                 # gss.run.servers.connectors.Plain:

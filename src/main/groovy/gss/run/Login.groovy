@@ -36,9 +36,10 @@ import joptsimple.OptionParser
 import joptsimple.OptionSet
 import org.hibernate.SessionFactory
 import org.hibernate.Session
-import gss.socket.ServerSocket
+import gss.login.socket.ServerSocket
+import gss.login.Servers
 
-class Booter {
+class Login {
     private static Boolean run = true;
     private static Config config;
     private static SessionFactory sessionFactory;
@@ -70,9 +71,9 @@ class Booter {
         configDir.mkdirs();
         if (configDir.exists()) {
             config.setDirectory(configDir);
-            Logger.getLogger(Booter.getClass().getName()).info("Configuration directory being used " + configDir.getAbsolutePath());
+            Logger.getLogger(Login.getClass().getName()).info("Configuration directory being used " + configDir.getAbsolutePath());
         } else {
-            Logger.getLogger(Booter.getClass().getName()).severe("Cannot continue configuration directory does not exist and cannot!\n" + configDir.getAbsolutePath());
+            Logger.getLogger(Login.getClass().getName()).severe("Cannot continue configuration directory does not exist and cannot!\n" + configDir.getAbsolutePath());
             run = false;
         }
         //load configuration into config class!
@@ -106,7 +107,7 @@ class Booter {
             run = false;
         } else {
             //database url exists, otherwise we can't work...
-            Logger.getLogger(Booter.getClass().getName()).info("Using database connection: " + configH.get("openjpa.ConnectionURL"));
+            Logger.getLogger(Login.getClass().getName()).info("Using database connection: " + configH.get("openjpa.ConnectionURL"));
             for (String key: configH.keySet()) {
                 config.getAnnotationConfiguration().setProperty(key, configH.get(key));
             }

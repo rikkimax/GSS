@@ -25,11 +25,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package gss.socket.connectors
+package gss.login.socket.connectors
 
-import gss.socket.SocketClient
+import gss.login.socket.SocketClient
 import com.esotericsoftware.kryonet.Connection
-import gss.socket.ServerSocket
+import gss.login.socket.ServerSocket
 import org.apache.commons.lang.StringUtils
 
 class KryoNetClient extends SocketClient {

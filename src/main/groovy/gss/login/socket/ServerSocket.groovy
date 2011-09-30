@@ -25,42 +25,29 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package gss.socket
+package gss.login.socket
 
-import com.esotericsoftware.kryonet.Connection
+public class ServerSocket {
 
-public class SocketClient {
-    private ServerSocket serverSocket;
+    SocketClient[] getClients() {}
 
-    SocketClient(ServerSocket serverSocket) {
-        this.serverSocket = serverSocket;
-    }
-    /**
-     * Returns the ID of the connection
-     * Uses the port from the ip
-     * (ip=192.168.0.1,port=34527)34527.19216801
-     * @return The string containing the ID of the connection.
-     */
-    String getID() {}
-
-    String getIP() {}
-
-    int getPort() {}
-
-    void sendMessage(Object message) {}
-
-    /**
-     * This should close the connection and remove it from the ServerSocket..
-     */
-    void close() {}
-
-    Connection getConnection() {
-        return connection;
-    }
-
-    ServerSocket getServerSocket() {
-        return serverSocket;
-    }
-
-    Long getTimeReceived() {};
+/**
+ * Gets the client based on their ID
+ * @param id The ID of the connection
+ * @return The SocketClient referring to the client.
+ */
+    SocketClient getClient(String id) {}
+/**
+ * Sets the values of the socket.
+ * @param values The values to set
+ */
+    void setValues(HashMap<Object, Object> values) {}
+/**
+ * Start the connection
+ */
+    void start() {}
+/**
+ * Stop the connection
+ */
+    void stop() {}
 }
