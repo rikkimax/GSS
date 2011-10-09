@@ -38,12 +38,54 @@ class EventManager {
         }
     }
 
+    void addEvent(Class clasz, Event event) {
+        addEvent(clasz.getCanonicalName(), event);
+    }
+
+    void addEvent(Object key, Event event) {
+        addEvent(key.getClass(), event);
+    }
+
+    void removeEvent(String key) {
+        events.remove(key);
+    }
+
+    void removeEvent(Class clasz) {
+        removeEvent(clasz.getCanonicalName());
+    }
+
+    void removeEvent(Object key) {
+        removeEvent(key.getClass());
+    }
+
     void removeEvent(Event event) {
+        events.each {
+            it.value.remove(event);
+        }
+    }
+
+    void removeEvent(Class clasz, Event event) {
+        removeEvent(clasz.getCanonicalName(), event);
+    }
+
+    void removeEvent(Object key, Event event) {
+        removeEvent(key.getClass(), event);
+    }
+
+    void removeEvent(String key, Event event) {
         getEvents(key).remove(event);
     }
 
     ConcurrentHashMap<String, ArrayList<Event>> getEvents() {
         return events;
+    }
+
+    void getEvents(Class clasz) {
+        getEvents(clasz.getCanonicalName());
+    }
+
+    void getEvents(Object key) {
+        getEvents(key.getClass());
     }
 
     ArrayList<Event> getEvents(String key) {
@@ -53,6 +95,14 @@ class EventManager {
             events.put(key, new ArrayList<Event>());
             return events.get(key);
         }
+    }
+
+    void trigger(Class clasz, Object... pass) {
+        trigger(clasz.getCanonicalName(), pass);
+    }
+
+    void trigger(Object key, Object... pass) {
+        trigger(key.getClass(), pass);
     }
 
     void trigger(String key, Object... pass) {
