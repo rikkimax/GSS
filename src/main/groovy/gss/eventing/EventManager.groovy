@@ -35,6 +35,7 @@ class EventManager {
     void addEvent(String key, Event event) {
         if (!getEvents(key).contains(event)) {
             getEvents(key).add(event);
+            event.create(key);
         }
     }
 
@@ -47,6 +48,11 @@ class EventManager {
     }
 
     void removeEvent(String key) {
+        if (events.contains(key)) {
+            events.get(key).each {
+                it.destroy(key);
+            }
+        }
         events.remove(key);
     }
 
@@ -60,6 +66,9 @@ class EventManager {
 
     void removeEvent(Event event) {
         events.each {
+            if (it.value.contains(event)) {
+                event.destroy(it.key);
+            }
             it.value.remove(event);
         }
     }

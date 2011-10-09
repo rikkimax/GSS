@@ -27,12 +27,40 @@
 
 package gss.eventing
 
+/**
+ * An overideable class for use with the EventManager
+ */
 class Event {
+
+    /**
+     *
+     */
     Event() {
 
     }
 
-    public void run(String trigger, Object[] passed) {
+    /**
+     * Overidden method to provide code to execute.
+     * @param trigger The triggor key that was used.
+     * @param passed Any passed data provided by the trigger.
+     */
+    void run(String trigger, Object[] passed) {
+
+    }
+
+    /**
+     * During creation or assimulation with a key to this event this gets called.
+     * @param key The key being assimulated to.
+     */
+    void create(String key) {
+
+    }
+
+    /**
+     * During destruction or deasimulation of an even to a key this method gets called.
+     * @param key The key being deasimulated to.
+     */
+    void destroy(String key) {
 
     }
 }
