@@ -1,5 +1,5 @@
 Game Server System (GSS) is a framework written in java to act as a server for games and services.
-It is made up of atleast 3 nodes.
+It is made up of at least 3 nodes.
     Login
     Database
     Processing
@@ -10,4 +10,4 @@ Database can be any regular relational database like MySQL. Will be connected to
 Processing is a custom node written entirely to get data from the database then put it back in processed.
 Content is a way to host and push out new content specifically for this server to the clients. What is used is entirely dependent on the clients but it can be e.g. Apache Web Server.
 
-Every node will be designed to be scaled in theory. The biggest draw back is that the database server may not cluster and propergate the updates in a timely fasion.
+Every node will be designed to be scaled in theory. The biggest draw back is that the database server may not cluster and propagate the updates in a timely fashion.
