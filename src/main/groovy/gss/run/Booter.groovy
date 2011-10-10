@@ -62,7 +62,7 @@ class Booter {
      * @param args Arguments given to application
      */
     static void main(String... args) {
-        Logger.getLogger("gss.run").setLevel(Level.ALL);
+        Logger.getLogger("gss.Booter").setLevel(Level.ALL);
         OptionParser optionParser = new OptionParser();
         optionsAdd(optionParser);
         OptionSet optionSet = optionParser.parse(args);
@@ -98,9 +98,9 @@ class Booter {
         configDir.mkdirs();
         if (configDir.exists()) {
             config.setDirectory(configDir);
-            Logger.getLogger(LoginNode.getClass().getName()).info("Configuration directory being used " + configDir.getAbsolutePath());
+            Logger.getLogger(Booter.class.getName()).info("Configuration directory being used " + configDir.getAbsolutePath());
         } else {
-            Logger.getLogger(LoginNode.getClass().getName()).severe("Cannot continue configuration directory does not exist and cannot!\n" + configDir.getAbsolutePath());
+            Logger.getLogger(Booter.class.getName()).severe("Cannot continue configuration directory does not exist and cannot!\n" + configDir.getAbsolutePath());
             keepGoingStartUp = false;
         }
         config.load();
@@ -113,6 +113,7 @@ class Booter {
         if (keepGoingStartUp)
             startUpDataBase();
     }
+
     /**
      * Set up Hibernate for database access.
      */
@@ -134,7 +135,7 @@ class Booter {
             keepGoingStartUp = false;
         else {
             //database url exists, otherwise we can't work...
-            Logger.getLogger(LoginNode.getClass().getName()).info("Using database connection: " + configH.get("openjpa.ConnectionURL"));
+            Logger.getLogger(Booter.class.getName()).info("Using database connection: " + configH.get("openjpa.ConnectionURL"));
             configH.keySet().each {
                 config.getAnnotationConfiguration().setProperty(it, configH.get(it));
             }

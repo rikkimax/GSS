@@ -25,19 +25,18 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-
 package gss.run;
 
-
 import org.junit.Test
-import static gss.run.LoginNode.*
+import static gss.run.booters.BootAll.*
 
-public class LoginTest {
+public class BootAllTest {
 
     @Test
     public void testHelp() {
-        LoginNode.main("");
-        LoginNode.main("--help");
+        main("");
+        main("--help");
+        main("test");
+        main("login", "keepgoing");
     }
 }

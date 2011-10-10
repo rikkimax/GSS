@@ -52,9 +52,9 @@ class LoginNode extends Booter {
     /**
      * An overidden method to provide extra start up procedures.
      */
-    @Override
     static void startup() {
-        super()
+       if (keepGoingStartUp)
+            startUpDataBase();
         if (keepGoingStartUp)
             startUpServers();
     }
