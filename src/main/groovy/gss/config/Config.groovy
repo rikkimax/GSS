@@ -35,22 +35,49 @@ import org.hibernate.cfg.AnnotationConfiguration
 import java.util.logging.Logger
 import com.esotericsoftware.kryo.Kryo
 
+/**
+ * The purpose of this class is to provide a means in which configuration of the GSS framework is defined and stored.
+ */
 class Config {
+    /**
+     *  The working directory where the configuration files are present.
+     */
     private FileObject directory;
+    /**
+     * A list of servers to be used by this instance, created from configuration files.
+     */
     private ArrayList<gss.config.Server> servers;
+    /**
+     * Annotation configuration for Hibernate for working with classes defined in configuration file.
+     */
     private AnnotationConfiguration annotationConfiguration;
+    /**
+     * Kryo serializer to be used with KryoNet server connector.
+     * Classes are loaded from configuration file and should be identifical to annotationConfiguration.
+     */
     private Kryo kryo;
 
+    /**
+     * Set the current working directory of the configuration files
+     * @param directory The directory to use to set to.
+     */
     void setDirectory(File directory) {
         if (directory.isDirectory() && directory.exists()) {
             this.directory = VFS.getManager().toFileObject(directory);
         }
     }
 
+    /**
+     * Get the current working directory for configuration files.
+     * @return The FileObject representing the current working configuration directory.
+     */
     FileObject getDirectory() {
         return directory;
     }
 
+    /**
+     * Load settings from configuration files
+     */
     void load() {
         //how are we storing it?
         //does it need to be dynamic?
@@ -62,10 +89,19 @@ class Config {
         setupHibernateFactory(serializedClasses);
     }
 
-    ArrayList<gss.config.Server> getServers() {
+    /**
+     * Returns a list of servers currently configured to work with this instance from configuration file.
+     * @return The list of servers from configuration files.
+     */
+    final ArrayList<gss.config.Server> getServers() {
         return servers;
     }
 
+    /**
+     * Create and configures AnnotationConfiguration for use with Hibernate as well as registers the serialized classes
+     * to Kryo and AnnotationConfiguration.
+     * @param serializedClasses The serialized classes that can be used.
+     */
     void setupHibernateFactory(List serializedClasses) {
         kryo = new Kryo();
         annotationConfiguration = new AnnotationConfiguration();
@@ -77,11 +113,19 @@ class Config {
         }
     }
 
-    AnnotationConfiguration getAnnotationConfiguration() {
+    /**
+     * Gets the AnnotationConfiguration to be used with Hibernate.
+     * @return The AnnotationConfiguration to be used.
+     */
+    final AnnotationConfiguration getAnnotationConfiguration() {
         return annotationConfiguration;
     }
 
-    Kryo getKryo() {
+    /**
+     * Gets the Kryo instance to be used with KryoNet.
+     * @return The Kryo instance to be used.
+     */
+    final Kryo getKryo() {
         return kryo;
     }
 }

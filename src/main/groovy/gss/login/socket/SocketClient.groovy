@@ -27,11 +27,16 @@
 
 package gss.login.socket
 
-import com.esotericsoftware.kryonet.Connection
-
-public class SocketClient {
+class SocketClient {
+    /**
+     * The server connector for this client.
+     */
     private ServerSocket serverSocket;
 
+    /**
+     * Initiate and create this class object instance.
+     * @param serverSocket The server connector class instance.
+     */
     SocketClient(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
     }
@@ -43,10 +48,22 @@ public class SocketClient {
      */
     String getID() {}
 
+    /**
+     * Get the IP of the client used.
+     * @return The IP the client used.
+     */
     String getIP() {}
 
+    /**
+     * Get the port the client used.
+     * @return The port the client used to connect.
+     */
     int getPort() {}
 
+    /**
+     * Send a message to the client
+     * @param message The message.
+     */
     void sendMessage(Object message) {}
 
     /**
@@ -54,13 +71,17 @@ public class SocketClient {
      */
     void close() {}
 
-    Connection getConnection() {
-        return connection;
-    }
-
+    /**
+     * Get the server socket (server connector).
+     * @return The server connector.
+     */
     ServerSocket getServerSocket() {
         return serverSocket;
     }
 
+    /**
+     * Get the time this message was received.
+     * @return Time received.
+     */
     Long getTimeReceived() {};
 }

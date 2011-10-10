@@ -30,21 +30,46 @@ package gss.login.socket.connectors
 import gss.login.socket.ServerSocket
 import gss.login.socket.SocketClient
 import com.esotericsoftware.kryonet.Server
-import gss.run.Login
+import gss.run.LoginNode
 import com.esotericsoftware.kryonet.Connection
 
+/**
+ * This class connects GSS networking server sockets API with KryoNet networking library.
+ */
 class KryoNetServer extends ServerSocket {
-    Server server = new Server(16384, 2048, Login.getConfig().getKryo());
+
+    /**
+     * Is the ID of the client a simple one?
+     */
+    private Boolean simpleID;
+    /**
+     * Provides the server to listen with.
+     */
+    Server server = new Server(16384, 2048, LoginNode.getConfig().getKryo());
+    /**
+     * Provides a link function to the received function in this class.
+     * Allows for dynamic function listening.
+     * With clean IDE integration.
+     */
     private def clojureReceived = Eval.x(this, "return new com.esotericsoftware.kryonet.Listener() {public void received(com.esotericsoftware.kryonet.Connection connection, Object object) {x.received(connection, object);}};");
 
+    /**
+     * Get all clients currently connected in a SocketClient interface (wrapper).
+     * @return A list of a wrapped client connection.
+     */
     synchronized SocketClient[] getClients() {
         ArrayList<KryoNetClient> clients = new ArrayList<KryoNetClient>();
         for (Connection connection: server.connections) {
-            clients.add(new KryoNetClient(this, connection));
+            clients.add(new KryoNetClient(this, connection, simpleID));
         }
         return clients.toArray();
     }
 
+    /**
+     * Gets a client currently connected in a SocketClient interface (wrapper).
+     * @param id The unique ID of the client.
+     * @return The SocketClient of the client if it exists otherwise null.
+     */
     synchronized SocketClient getClient(String id) {
         getClients().each() {
             if (it.getID() == id)
@@ -53,6 +78,11 @@ class KryoNetServer extends ServerSocket {
         return null;
     }
 
+    /**
+     * Is the client currently connected?
+     * @param id The unique ID of the client.
+     * @return If the client is connected or not.
+     */
     synchronized Boolean isClientConnected(String id) {
         getClients().each() {
             if (it.getID() == id)
@@ -61,6 +91,18 @@ class KryoNetServer extends ServerSocket {
         return false;
     }
 
+    /**
+     * Is the client ID simple?
+     * @return If the client ID is simple.
+     */
+    Boolean isSimpleID() {
+        return simpleID;
+    }
+
+    /**
+     * Set the values of the server instance from configuration.
+     * @param values The values to set to.
+     */
     synchronized void setValues(HashMap<Object, Object> values) {
         int tcp;
         int udp;
@@ -69,29 +111,46 @@ class KryoNetServer extends ServerSocket {
             if (values.get("udp") != null) {
                 udp = (Integer) values.get("udp");
             }
-        } else if (values.get("port") != null) {
+        } else if (values.get("port") != null)
             tcp = (Integer) values.get("port");
-        }
+
+        if (values.get("simpleID") != null)
+            simpleID = values.get("simpleID");
+        else if (values.get("simpleId") != null)
+            simpleID = values.get("simpleId");
+        else if (values.get("simpleid") != null)
+            simpleID = values.get("simpleid");
         if (tcp != null && udp != null)
             server.bind(tcp, udp);
         else if (tcp != null && udp == null)
             server.bind(tcp);
         else
         //we are invalid so lets remove it from list...
-            Login.getServers().removeSocket(this);
+            LoginNode.getServers().removeSocket(this);
     }
 
+    /**
+     * Start the server listening
+     */
     synchronized void start() {
         server.addListener(clojureReceived);
     }
 
+    /**
+     * Stop the server listening
+     */
     synchronized void stop() {
         server.stop();
         server.removeListener(clojureReceived);
     }
 
+    /**
+     * This gets called from KryoNet server function connector, and only from there.
+     * @param connection The connection that sent it.
+     * @param message The message object.
+     */
     protected void received(Connection connection, Object message) {
-        KryoNetClient kryoNetClient = new KryoNetClient(this, connection);
+        KryoNetClient kryoNetClient = new KryoNetClient(this, connection, simpleID);
 
     }
 }

@@ -26,28 +26,34 @@
  */
 
 package gss.login.socket
+/**
+ * An extended (to be implemented) class to offer an interface for connections.
+ */
+class ServerSocket {
 
-public class ServerSocket {
-
+    /**
+     * Get all the clients.
+     * @return
+     */
     SocketClient[] getClients() {}
 
-/**
- * Gets the client based on their ID
- * @param id The ID of the connection
- * @return The SocketClient referring to the client.
- */
+    /**
+     * Gets the client based on their ID
+     * @param id The ID of the connection
+     * @return The SocketClient referring to the client.
+     */
     SocketClient getClient(String id) {}
-/**
- * Sets the values of the socket.
- * @param values The values to set
- */
+    /**
+     * Sets the values of the socket.
+     * @param values The values to set
+     */
     void setValues(HashMap<Object, Object> values) {}
-/**
- * Start the connection
- */
+    /**
+     * Start the connection
+     */
     void start() {}
-/**
- * Stop the connection
- */
+    /**
+     * Stop the connection
+     */
     void stop() {}
 }

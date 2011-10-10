@@ -1,6 +1,5 @@
-import java.nio.ByteBuffer
-import com.esotericsoftware.kryo.serialize.StringSerializer
-import com.esotericsoftware.kryo.Kryo
+package gss.run
+
 import org.yaml.snakeyaml.Yaml
 
 /*

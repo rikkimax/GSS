@@ -1,3 +1,5 @@
+package gss.run
+
 import com.esotericsoftware.kryonet.Server
 import com.esotericsoftware.kryonet.Listener
 import com.esotericsoftware.kryonet.Connection

@@ -39,82 +39,29 @@ import org.hibernate.Session
 import gss.login.socket.ServerSocket
 import gss.login.Servers
 
-class Login {
-    private static Boolean run = true;
-    private static Config config;
-    private static SessionFactory sessionFactory;
+/**
+ * This is a booter class, it will start every thing up for the login node.
+ */
+class LoginNode extends Booter {
+
+    /**
+     * All the servers available from configuration file.
+     */
     private static Servers servers;
 
-    static void main(String... args) {
-        Logger.getLogger("gss.run").setLevel(Level.ALL);
-        OptionParser optionParser = new OptionParser();
-        optionParser.acceptsAll(["help", "?"], "Help information");
-        optionParser.acceptsAll(["configDir", "c"], "Configuration directory").withRequiredArg().ofType(File.class).defaultsTo(new File("config"));
-        OptionSet optionSet = optionParser.parse(args);
-        if (optionSet.has("help")) {
-            optionParser.printHelpOn(System.out);
-            run = false;
-        } else {
-            //we are not required as we printed help (END OF APP)
-            config = new Config();
-            parseArguments(optionParser, optionSet);
-        }
-        if (run) {
-            //do something like actually setup some variables...
-            //only because we are still wanted!
-            startup();
-        }
-    }
-
-    static void parseArguments(OptionParser optionParser, OptionSet optionSet) {
-        File configDir = ((File) optionSet.valueOf("configDir"));
-        configDir.mkdirs();
-        if (configDir.exists()) {
-            config.setDirectory(configDir);
-            Logger.getLogger(Login.getClass().getName()).info("Configuration directory being used " + configDir.getAbsolutePath());
-        } else {
-            Logger.getLogger(Login.getClass().getName()).severe("Cannot continue configuration directory does not exist and cannot!\n" + configDir.getAbsolutePath());
-            run = false;
-        }
-        //load configuration into config class!
-        config.load();
-    }
-
+    /**
+     * An overidden method to provide extra start up procedures.
+     */
+    @Override
     static void startup() {
-        if (run)
-            startUpDataBase();
-        if (run)
+        super()
+        if (keepGoingStartUp)
             startUpServers();
-
     }
 
-    static void startUpDataBase() {
-        //find database server details from config
-        Server database;
-        HashMap configH = new HashMap();
-        for (Server server: config.getServers()) {
-            if (server.getType().toLowerCase().equals("database")) {
-                database = server;
-            }
-        }
-        //set database server from config
-        for (String key: database.getOther().keySet()) {
-            if (key.startsWith("hibernate")) {
-                configH.put(key, database.getOther().get(key).toString().replace("{configDir}", config.getDirectory().getURL().toString()));
-            }
-        }
-        if (configH.get("hibernate.connection.url") == null) {
-            run = false;
-        } else {
-            //database url exists, otherwise we can't work...
-            Logger.getLogger(Login.getClass().getName()).info("Using database connection: " + configH.get("openjpa.ConnectionURL"));
-            for (String key: configH.keySet()) {
-                config.getAnnotationConfiguration().setProperty(key, configH.get(key));
-            }
-            sessionFactory = config.getAnnotationConfiguration().buildSessionFactory();
-        }
-    }
-
+    /**
+     * Starts up server connectors from configuration.
+     */
     static void startUpServers() {
         //find current server details from config
         servers = new Servers();
@@ -143,19 +90,10 @@ class Login {
         servers.start();
     }
 
-    static Config getConfig() {
-        return config;
-    }
-
-    static EntityManager getEntityManager() {
-        return entityManager;
-    }
-
-    static Session getSession() {
-        //give us a new session that is opened so we can work with the database
-        return sessionFactory.openSession();
-    }
-
+    /**
+     * Gets the servers connectors.
+     * @return The servers connectors.
+     */
     static Servers getServers() {
         return servers;
     }

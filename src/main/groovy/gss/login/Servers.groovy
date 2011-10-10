@@ -29,37 +29,65 @@ package gss.login
 
 import gss.login.socket.ServerSocket;
 
+/**
+ * The point of this class is to store the server connectors.
+ */
 class Servers {
+
+    /**
+     * The list of server connectors.
+     */
     private ArrayList<ServerSocket> sockets = new ArrayList<ServerSocket>();
 
+    /**
+     * Add a new server connector.
+     * @param serverSocket The server connector to add.
+     */
     void addSocket(ServerSocket serverSocket) {
         sockets.add(serverSocket);
     }
 
+    /**
+     * Remove a server connector.
+     * @param serverSocket The server connector to remove.
+     */
     void removeSocket(ServerSocket serverSocket) {
         sockets.remove(serverSocket);
         serverSocket.stop();
     }
 
+    /**
+     * Get all the servers connectors.
+     * @return All the server connectors.
+     */
     ArrayList<ServerSocket> getSockets() {
         return sockets;
     }
 
+    /**
+     * Removes all server connectors.
+     */
     void clear() {
-        for (ServerSocket serverSocket: sockets) {
-            removeSocket(serverSocket);
+        sockets.each {
+            removeSocket(it);
         }
     }
 
+    /**
+     * Start all server connectors.
+     */
     void start() {
-        for (ServerSocket serverSocket: sockets) {
-            serverSocket.start();
+        sockets.each {
+            it.start();
         }
     }
 
+    /**
+     * Stops all server connectors.
+     */
     void stop() {
-        for (ServerSocket serverSocket: sockets) {
-            serverSocket.stop();
+        sockets.each {
+            it.stop();
         }
     }
 }

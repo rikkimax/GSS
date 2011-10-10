@@ -38,6 +38,7 @@ import org.yaml.snakeyaml.reader.StreamReader
 import org.yaml.snakeyaml.reader.UnicodeReader
 
 /**
+ * This class merges BeanUtils and SnakeyYaml to provide a filled class object with values also being able to be classes.
  * @author rikki
  */
 public class Yaml2 extends Yaml {
@@ -103,10 +104,10 @@ public class Yaml2 extends Yaml {
         }
         return ret;
     }
-    /*
-     *This method was just a copy paste as it was private and couldn't use it..
-     */
 
+    /**
+     * This method was just a copy paste as it was private and couldn't use it..
+     */
     Object loadFromReader(StreamReader sreader) {
         Composer composer = new Composer(new ParserImpl(sreader), resolver);
         constructor.setComposer(composer);

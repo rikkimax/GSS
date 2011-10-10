@@ -36,7 +36,7 @@ public class LoginTest {
 
     @Test
     public void testHelp() {
-        Login.main("");
-        Login.main("--help");
+        LoginNode.main("");
+        LoginNode.main("--help");
     }
 }
