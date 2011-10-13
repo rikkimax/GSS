@@ -34,26 +34,46 @@ public class BootAllTest {
 
     @Test
     public void testHelp() {
+        println("-------------------------------------------");
+        println("testHelp - Will output the help contents of");
+        println("    the BootAll CLI.");
+        println("-------------------------------------------");
         main("--help");
     }
 
     @Test
     public void nothing() {
-        main("");
+        println("-------------------------------------------");
+        println("nothing - Nothing passed so show help");
+        println("-------------------------------------------");
+        main([] as String[]);
     }
 
     @Test
     public void nullNode() {
+        println("-------------------------------------------");
+        println("nullNode - No nodes should be loaded as one");
+        println("    specified is invalid.");
+        println("-------------------------------------------");
         main("test");
     }
 
     @Test
     public void loginKeepGoingNodes() {
+        println("-------------------------------------------");
+        println("loginKeepGoingNodes - Should start a login");
+        println("    node and a keep going node.");
+        println("-------------------------------------------");
         main("login", "keepgoing");
     }
 
     @Test
     public void databaseLoginKeepGoingNodes() {
+        println("-------------------------------------------");
+        println("databaseLoginKeepGoingNodes - should start");
+        println("    and HDSQLDB database, login and a keep");
+        println("    going node.");
+        println("-------------------------------------------");
         main("--db=9001", "login", "keepgoing");
     }
 }
