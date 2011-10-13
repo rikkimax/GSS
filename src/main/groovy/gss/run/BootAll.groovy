@@ -52,7 +52,7 @@ class BootAll {
         OptionParser optionParser = new OptionParser();
         optionsAdd(optionParser);
         OptionSet optionSet = optionParser.parse(args);
-        if (optionSet.has("help")) {
+        if (optionSet.has("help") || (!optionSet.hasOptions() && optionSet.nonOptionArguments().size() < 1)) {
             optionParser.printHelpOn(System.out);
             println("");
             println("A list of nodes to load");
@@ -61,7 +61,7 @@ class BootAll {
             println("It is recommended to use one and only one of KeepGoing node.");
             println("\tKeepGoing is used to keep the servers alive if there is no threaded tasks running.");
             keepGoingStartUp = false;
-        } else {
+        } else if (optionSet.hasOptions() || optionSet.nonOptionArguments().size() > 0) {
             parseArguments(optionParser, optionSet);
         }
     }
@@ -70,10 +70,10 @@ class BootAll {
      * This method adds options to use.
      * @param op The OptionParser.
      */
-    static void optionsAdd(OptionParser op) {
+    private static void optionsAdd(OptionParser op) {
         op.acceptsAll(["help", "?"], "Help information");
         op.acceptsAll(["configDir", "c"], "Configuration directory").withRequiredArg().ofType(File.class).defaultsTo(new File("config"));
-        op.acceptsAll(["uniqueConfigDir", "ucd"], "Does each server have its own unique config directory?").withOptionalArg().ofType(Boolean.class).defaultsTo(false);
+        op.acceptsAll(["uniqueConfigDir", "ucd"], "Does each server have its own unique config directory?").withOptionalArg().ofType(Boolean.class).defaultsTo(true);
         op.acceptsAll(["hsqldb", "db"], "Creates a HSQLDB on a speicifc port. Preferred to be used with uniqueConfigDir option as well.").withRequiredArg().ofType(Integer.class).defaultsTo(9001);
     }
 
@@ -82,12 +82,31 @@ class BootAll {
      * @param optionParser The parser class.
      * @param optionSet The options given.
      */
-    static void parseArguments(OptionParser optionParser, OptionSet optionSet) {
+    private static void parseArguments(OptionParser optionParser, OptionSet optionSet) {
         File configDir = optionSet.valueOf("configDir");
         Boolean uniqueConfigDir = optionSet.valueOf("uniqueConfigDir");
+        parseArgumentsDataBase(optionParser, optionSet, configDir, uniqueConfigDir);
+        if (!uniqueConfigDir) {
+            List<String> copy = new ArrayList<String>();
+            Collections.copy(optionSet.nonOptionArguments(), copy);
+            copy.remove("keepgoing");
+            if (copy.size() > 1 || (copy.size() == 1 && optionSet.has("hsqldb")))
+                Logger.getLogger("gss.BootAll").severe("There is more then 1 server node operational configuration will be corrupt for doing this.");
+        }
+        parseArgumentsNodes(optionParser, optionSet, configDir, uniqueConfigDir);
+    }
+
+    /**
+     * Parses the arguments given to the application for a database server.
+     * @param optionParser The parser class.
+     * @param optionSet The options given.
+     * @param configDir Configuration directory.
+     * @param uniqueConfigDir Do we use a unique directory folder structure?
+     */
+    private static void parseArgumentsDataBase(OptionParser optionParser, OptionSet optionSet, File configDir, Boolean uniqueConfigDir) {
         if (optionSet.has("hsqldb")) {
             if (!uniqueConfigDir)
-                Logger.getLogger("gss.BootAll").warning("This is bad, database server should be ran either by itself or with uniqueConfigDir on.");
+                Logger.getLogger("gss.BootAll").warning("Database server should be ran either by itself or with uniqueConfigDir on.");
             Thread.start {
                 File tempUniqueConfigDir = new File(configDir.getAbsolutePath().replace("\\", "/") + "hsqldb/");
                 Logger.getLogger("gss.BootAll").info("Creating database server");
@@ -97,22 +116,30 @@ class BootAll {
                     Server.main(["-database", configDir, "-port " + optionSet.valueOf("hsqldb")]);
             }
         }
-        if (!uniqueConfigDir) {
-            List<String> copy = new ArrayList<String>();
-            Collections.copy(optionSet.nonOptionArguments(), copy);
-            copy.remove("keepgoing");
-            if (copy.size() > 1 || (copy.size() == 1 && optionSet.has("hsqldb")))
-                Logger.getLogger("gss.BootAll").severe("There is more then 1 server node operational configuration will be corrupt for doing this.");
-        }
+    }
+
+    /**
+     * Parses the arguments given to the application for the nodes.
+     * @param optionParser The parser class.
+     * @param optionSet The options given.
+     * @param configDir Configuration directory.
+     * @param uniqueConfigDir Do we use a unique directory folder structure?
+     */
+    private static void parseArgumentsNodes(OptionParser optionParser, OptionSet optionSet, File configDir, Boolean uniqueConfigDir) {
         Map<String, Integer> countUsed = new HashMap<String, Integer>();
         countUsed.put("keepgoing", 0);
         countUsed.put("login", 0);
         optionSet.nonOptionArguments().each {
             String type = it.toLowerCase();
-            File tempUniqueConfigDir = new File(configDir.getAbsolutePath().replace("\\", "/") + type + "/");
+            String extension = "";
+            if (countUsed.get(type) > 0)
+                extension = "_" + countUsed.get(type) + "";
+            File tempUniqueConfigDir = new File(configDir.getAbsolutePath().replace("\\", "/") + type + extension + "/");
             switch (type) {
                 case "keepgoing":
                     countUsed.put(type, countUsed.get(type) + 1);
+                    if (countUsed.get(type) > 1)
+                        Logger.getLogger("gss.BootAll").warning("We should have only one and max one KeepGoing node...");
                     Thread.start {
                         while (true)
                             sleep 1000;
@@ -133,6 +160,14 @@ class BootAll {
                     break;
             }
         };
+        statisticsNodes(countUsed);
+    }
+
+    /**
+     * Outputs some basic statistics from what was loaded to do with the nodes.
+     * @param countUsed A list of loaded nodes.
+     */
+    private static void statisticsNodes(Map<String, Integer> countUsed) {
         Integer totalNodes = 0;
         println("");
         println("Loaded statistics");
