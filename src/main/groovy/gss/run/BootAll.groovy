@@ -31,6 +31,7 @@ import joptsimple.OptionParser
 import joptsimple.OptionSet
 import java.util.logging.Level
 import java.util.logging.Logger
+import org.hsqldb.Server
 
 /**
  * Boots all or some of the other node types.
@@ -57,6 +58,8 @@ class BootAll {
             println("A list of nodes to load");
             println("------------------------");
             println("\tValid types: Login,KeepGoing");
+            println("It is recommended to use one and only one of KeepGoing node.");
+            println("\tKeepGoing is used to keep the servers alive if there is no threaded tasks running.");
             keepGoingStartUp = false;
         } else {
             parseArguments(optionParser, optionSet);
@@ -71,6 +74,7 @@ class BootAll {
         op.acceptsAll(["help", "?"], "Help information");
         op.acceptsAll(["configDir", "c"], "Configuration directory").withRequiredArg().ofType(File.class).defaultsTo(new File("config"));
         op.acceptsAll(["uniqueConfigDir", "ucd"], "Does each server have its own unique config directory?").withOptionalArg().ofType(Boolean.class).defaultsTo(false);
+        op.acceptsAll(["hsqldb", "db"], "Creates a HSQLDB on a speicifc port. Preferred to be used with uniqueConfigDir option as well.").withRequiredArg().ofType(Integer.class).defaultsTo(9001);
     }
 
     /**
@@ -81,11 +85,34 @@ class BootAll {
     static void parseArguments(OptionParser optionParser, OptionSet optionSet) {
         File configDir = optionSet.valueOf("configDir");
         Boolean uniqueConfigDir = optionSet.valueOf("uniqueConfigDir");
+        if (optionSet.has("hsqldb")) {
+            if (!uniqueConfigDir)
+                Logger.getLogger("gss.BootAll").warning("This is bad, database server should be ran either by itself or with uniqueConfigDir on.");
+            Thread.start {
+                File tempUniqueConfigDir = new File(configDir.getAbsolutePath().replace("\\", "/") + "hsqldb/");
+                Logger.getLogger("gss.BootAll").info("Creating database server");
+                if (uniqueConfigDir)
+                    Server.main(["-database", tempUniqueConfigDir, "-port " + optionSet.valueOf("hsqldb")]);
+                else
+                    Server.main(["-database", configDir, "-port " + optionSet.valueOf("hsqldb")]);
+            }
+        }
+        if (!uniqueConfigDir) {
+            List<String> copy = new ArrayList<String>();
+            Collections.copy(optionSet.nonOptionArguments(), copy);
+            copy.remove("keepgoing");
+            if (copy.size() > 1 || (copy.size() == 1 && optionSet.has("hsqldb")))
+                Logger.getLogger("gss.BootAll").severe("There is more then 1 server node operational configuration will be corrupt for doing this.");
+        }
+        Map<String, Integer> countUsed = new HashMap<String, Integer>();
+        countUsed.put("keepgoing", 0);
+        countUsed.put("login", 0);
         optionSet.nonOptionArguments().each {
             String type = it.toLowerCase();
             File tempUniqueConfigDir = new File(configDir.getAbsolutePath().replace("\\", "/") + type + "/");
             switch (type) {
                 case "keepgoing":
+                    countUsed.put(type, countUsed.get(type) + 1);
                     Thread.start {
                         while (true)
                             sleep 1000;
@@ -93,6 +120,7 @@ class BootAll {
                     break;
                 case "login":
                     Logger.getLogger("gss.BootAll").info("Creating login type node");
+                    countUsed.put(type, countUsed.get(type) + 1);
                     Thread.start {
                         if (uniqueConfigDir)
                             LoginNode.main("--configDir=${tempUniqueConfigDir}");
@@ -105,5 +133,15 @@ class BootAll {
                     break;
             }
         };
+        Integer totalNodes = 0;
+        println("");
+        println("Loaded statistics");
+        println("-----------------");
+        countUsed.keySet().each {
+            println(it + " has " + countUsed.get(it) + " implementations");
+            totalNodes += countUsed.get(it);
+        }
+        println("");
+        println("Total loaded " + totalNodes);
     }
 }

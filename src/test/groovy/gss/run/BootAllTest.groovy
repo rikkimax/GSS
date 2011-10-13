@@ -28,15 +28,32 @@
 package gss.run;
 
 import org.junit.Test
-import static gss.run.booters.BootAll.*
+import static gss.run.BootAll.*
 
 public class BootAllTest {
 
     @Test
     public void testHelp() {
-        main("");
         main("--help");
+    }
+
+    @Test
+    public void nothing() {
+        main("");
+    }
+
+    @Test
+    public void nullNode() {
         main("test");
+    }
+
+    @Test
+    public void loginKeepGoingNodes() {
         main("login", "keepgoing");
+    }
+
+    @Test
+    public void databaseLoginKeepGoingNodes() {
+        main("--db=9001", "login", "keepgoing");
     }
 }
