@@ -81,7 +81,7 @@ class LoginNode extends Booter {
                 if (serverClassReflected.newInstance() instanceof ServerSocket) {
                     for (HashMap<Object> serverValue: values) {
                         ServerSocket serverConnector = serverClassReflected.newInstance();
-                        serverConnector.setValues(values);
+                        serverConnector.setValues(serverValue);
                         servers.addSocket(serverConnector);
                     }
                 }
