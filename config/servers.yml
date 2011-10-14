@@ -1,4 +1,4 @@
-    -   #This server
+    -   # This server
         type: current
         host: 127.0.0.1 # we ignore this...
         port: -1 # we ignore this...
@@ -10,17 +10,17 @@
                             port: 100
                 # gss.run.servers.connectors.Plain:
 
-    -   #login server (custom made)
+    -   # Login server (custom made)
         type: login
         host: 127.0.0.1
         port: 7780
-        pass: #a password here
+        pass: # A password here
 
-    -   #database server (e.g. mysql)
+    -   # Database server (e.g. mysql)
         type: database
         host: 127.0.0.1
         port: 7781
-        pass: #a password here
+        pass: # A password here
         other:
             hibernate.connection.driver_class: org.hsqldb.jdbcDriver
             hibernate.connection.url: jdbc:hsqldb:{configDir}/database/database.db
@@ -35,14 +35,17 @@
             hibernate.hbm2ddl.auto: create-drop
             hibernate.show_sql: true
 
-    -   #content server (e.g. apache2)
+    -   # Content server (e.g. apache2)
         type: content
         host: 127.0.0.1
         port: 7782
-        pass: #a password here
+        pass: # A password here
+        other:
+            directory:{game}/{version}
+            # I'm just guessing.. for a multi game storage content server with different versions
 
-    -   #processing server (custom made)
+    -   # Processing server (custom made)
         type: processing
         host: 127.0.0.1
         port: 7783
-        pass: #a password here
+        pass: # A password here
