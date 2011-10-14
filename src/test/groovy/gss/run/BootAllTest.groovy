@@ -62,9 +62,9 @@ public class BootAllTest {
     public void loginKeepGoingNodes() {
         println("-------------------------------------------");
         println("loginKeepGoingNodes - Should start a login");
-        println("    node and a keep going node.");
+        println("    node and create a thread to keep process running.");
         println("-------------------------------------------");
-        main("login", "keepgoing");
+        main("login", "--KeepGoing");
     }
 
     @Test
