@@ -1,0 +1,256 @@
+/*
+ * Copyright © 2011, GSS team
+ * All rights reserved.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ * Neither the name of the GSS development organisation nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL GSS team BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+package gss.eventing
+
+import java.util.concurrent.ConcurrentHashMap
+import org.apache.commons.vfs.FileObject
+import gss.run.Booter
+import org.apache.commons.vfs.FileType
+import org.apache.commons.vfs.impl.DefaultFileMonitor
+import org.apache.commons.vfs.FileListener
+import org.apache.commons.vfs.FileChangeEvent
+import java.util.logging.Logger
+
+/**
+ * The point of this class is to provide a dynamic scripted events manager.
+ */
+class ScriptedEventManager {
+
+    /**
+     * A list of FileObjects of events to keys.
+     */
+    private ConcurrentHashMap<String, ArrayList<FileObject>> eventsFiles = new ConcurrentHashMap<String, ArrayList<FileObject>>();
+
+    /**
+     * A given Event value to a FileObject (cache).
+     */
+    private ConcurrentHashMap<FileObject, Event> eventsObjects = new ConcurrentHashMap<FileObject, Event>();
+
+    /**
+     * We really should also pass the booter to the event when its created
+     */
+    private Booter booter;
+
+    /**
+     * The classloader responsible for converting scripts to classes.
+     */
+    private GroovyClassLoader gcl = new GroovyClassLoader();
+
+    /**
+     * A file monitor to check for changes in file system.
+     */
+    private DefaultFileMonitor fileMonitor;
+
+    /**
+     * Lets create a new instance of this event manager.
+     * @param booter The booter that started this program.
+     */
+    ScriptedEventManager(Booter booter) {
+        this.booter = booter;
+
+        /**
+         * Listen for when file changes occur.
+         */
+        fileMonitor = new DefaultFileMonitor(new FileListener() {
+            /**
+             * On file creation tell us.
+             * @param fileChangeEvent The file change.
+             */
+            void fileCreated(FileChangeEvent fileChangeEvent) {
+            }
+
+            /**
+             * On file deletion tell us.
+             * @param fileChangeEvent The file change.
+             */
+            void fileDeleted(FileChangeEvent fileChangeEvent) {
+                reloadCache();
+            }
+
+            /**
+             * On file change tell us.
+             * @param fileChangeEvent The file change.
+             */
+            void fileChanged(FileChangeEvent fileChangeEvent) {
+                reloadCache();
+            }
+        });
+        fileMonitor.start();
+    }
+
+    /**
+     * Retruns a list of events for a trigger.
+     * @param key The key to use as trigger.
+     */
+    ArrayList<Event> getEvents(String key) {
+        List<Event> ret = new ArrayList<Event>();
+        List<FileObject> fileObjects = getFiles(key);
+        fileObjects?.each {
+            Object event = eventsObjects.get(it);
+            if (event != null)
+                ret.add(event);
+        }
+        if (fileObjects == null) {
+            eventsFiles.put(key, new ArrayList<FileObject>());
+        }
+        return ret;
+    }
+
+    /**
+     * Retruns a list of FileObject events for a trigger.
+     * @param key The key to use as trigger.
+     */
+    ArrayList<FileObject> getFiles(String key) {
+        List<Event> ret = eventsFiles.get(key);
+        if (ret == null) {
+            ret = new ArrayList<Event>();
+            eventsFiles.put(key, ret);
+        }
+        return ret;
+    }
+
+    /**
+     * Add an event to the manager.
+     * @param key The trigger key to use.
+     * @param fileObject The event file to use.
+     */
+    void addEvent(String key, FileObject fileObject) {
+        if (fileObject.exists())
+            if (fileObject.type == FileType.FILE) {
+                // So this is a file YAY!
+                // Lets add this file to be checked for...
+                // No idea if its actually an event or not lol
+                getFiles(key).add(fileObject);
+                loadClassCache(fileObject);
+            }
+    }
+
+    /**
+     * Gets the events as files associated with there triggers.
+     * @return The events as files associated with there triggers.
+     */
+    ConcurrentHashMap<String, ArrayList<FileObject>> getEventsFiles() {
+        return eventsFiles;
+    }
+
+    /**
+     * Gets Events objects with there file associateion.
+     * @return
+     */
+    ConcurrentHashMap<FileObject, Event> getEventsObjects() {
+        return eventsObjects;
+    }
+
+    /**
+     * Reloads the WHOLE cache and clears out all unused ones.
+     */
+    private void reloadCache() {
+        gcl.clearCache();
+        eventsFiles.each {keys, eventsList ->
+            eventsList.each {eventFile ->
+                Object returned = gcl.parseClass(eventFile.content.inputStream);
+                boolean failed = true;
+                if (returned != null)
+                    if (returned instanceof Class) {
+                        Object returnedObject = returned.newInstance();
+                        if (returnedObject instanceof Event) {
+                            eventsObjects.put(eventFile, returnedObject);
+                            failed = false;
+                            Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Loaded " + returnedObject.getClass().getName() + " into cache");
+                        }
+                    }
+                if (failed)
+                    Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Failed to load " + eventFile + " into cache");
+            }
+        }
+        eventsObjects.each {fileObject, cache ->
+            if (!eventsFiles.containsValue(fileObject)) {
+                eventsObjects.remove(fileObject);
+            }
+        }
+    }
+
+    /**
+     * Load a class into cache.
+     * @param fileObject The file to try and load.
+     */
+    private void loadClassCache(FileObject fileObject) {
+        eventsFiles.each {keys, eventsList ->
+            eventsList.each {eventFile ->
+                if (eventFile.getURL() == fileObject.getURL()) {
+                    Object returned = gcl.parseClass(eventFile.content.inputStream);
+                    boolean failed = true;
+                    if (returned != null)
+                        if (returned instanceof Class) {
+                            Object returnedObject = returned.newInstance();
+                            if (returnedObject instanceof Event) {
+                                eventsObjects.put(eventFile, returnedObject);
+                                failed = false;
+                                Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Loaded " + returnedObject.getClass().getName() + " into cache");
+                            }
+                        }
+                    if (failed)
+                        Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Failed to load " + fileObject + " into cache");
+                }
+            }
+        }
+    }
+
+    /**
+     * Triggers a list of events.
+     * @param key The key to use as trigger.
+     * @param context Who called this trigger.
+     * @param pass Anything required to pass to the events.
+     */
+    synchronized void trigger(String key, Object context, Object... pass) {
+        List<Event> events = getEvents(key);
+        events.each {event ->
+            event.run(key, context, pass);
+        }
+        if (events.size() <= 0 && events.contains(UnknownEvent.class))
+            trigger(UnknownEvent.class, context, pass);
+    }
+
+    /**
+     * Triggers a list of events.
+     * @param key The key to use as trigger.
+     * @param pass Anything required to pass to the events.
+     */
+    void trigger(Class key, Object context, Object... pass) {
+        trigger(key.getCanonicalName(), context, pass);
+    }
+
+    /**
+     * Triggers a list of events.
+     * @param key The key to use as trigger.
+     * @param pass Anything required to pass to the events.
+     */
+    void trigger(Object key, Object context, Object... pass) {
+        trigger(key.getClass(), context, pass);
+    }
+}
