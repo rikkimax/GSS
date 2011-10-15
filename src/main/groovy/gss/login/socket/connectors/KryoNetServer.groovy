@@ -160,6 +160,6 @@ class KryoNetServer extends ServerSocket {
      */
     protected void received(Connection connection, Object message) {
         KryoNetClient kryoNetClient = new KryoNetClient(this, connection, simpleID);
-
+        loginNode.eventManager.trigger(message, kryoNetClient, message);
     }
 }
