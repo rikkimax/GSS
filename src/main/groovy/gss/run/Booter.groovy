@@ -39,6 +39,8 @@ import org.hibernate.Session
 import gss.eventing.EventManager
 import org.apache.commons.vfs.FileObject
 import org.yaml.snakeyaml.Yaml
+import gss.eventing.Event
+import gss.eventing.UnknownEvent
 
 /**
  * The point of this class is to provide a generic booter to be extended.
@@ -164,15 +166,39 @@ abstract class Booter {
      * Set up the event manager from configuration.
      */
     void startUpEventManager() {
+        eventManager = new EventManager();
         FileObject eventsFO = config.getDirectory().resolveFile(getType())?.resolveFile("events.yml");
-        println(eventsFO);
         if (eventsFO?.exists()) {
             //Our type has a configuration directory and events file
             Yaml yaml = new Yaml();
             List<HashMap<String, List<String>>> content = yaml.load(eventsFO.content.inputStream);
-        } else {
-            //We have a big problem here...
-            //we don't have our own events file great
+            content.each {triggersEvents ->
+                triggersEvents.each {eventTrigger, events ->
+                    events.each {event ->
+                        Object eventTriggerEvaled = Eval.me("return ${eventTrigger};");
+                        Object eventEvaled = Eval.me("return new ${event}();");
+                        if (eventTriggerEvaled != null && eventEvaled != null) {
+                            if (eventEvaled instanceof Event)
+                                eventManager.addEvent(eventTriggerEvaled, eventEvaled);
+                        }
+                    }
+                }
+            }
+        }
+        // Convert any unused serialized classes to triggers or events, depending if it extends Event.
+        config.getSerializedClasses().each {
+            Object eventEvaled = Eval.me("return new ${it}();");
+            Boolean toTrigger = true;
+            if (eventEvaled != null)
+                if (eventEvaled instanceof Event)
+                    if (eventManager.containsEvent(eventEvaled) || eventManager.containsTrigger(eventEvaled))
+                        toTrigger = false;
+                    else {
+                    }
+                else if (eventManager.containsTrigger(it))
+                    toTrigger = false;
+            if (toTrigger)
+                eventManager.addEvent(it, new UnknownEvent());
         }
     }
 
@@ -213,7 +239,7 @@ abstract class Booter {
      * Get the type of the server
      * @return The type of the server
      */
-    String getType(){
+    String getType() {
         return "booter";
     }
 }
