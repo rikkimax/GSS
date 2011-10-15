@@ -58,7 +58,7 @@ class KryoNetServer extends ServerSocket {
      * We need to store who created us.
      * @param booter The booter who created us.
      */
-    KryoNetServer (LoginNode loginNode) {
+    KryoNetServer(LoginNode loginNode) {
         super(loginNode);
     }
 
@@ -143,6 +143,7 @@ class KryoNetServer extends ServerSocket {
      */
     synchronized void start() {
         server.addListener(clojureReceived);
+        server.start();
     }
 
     /**

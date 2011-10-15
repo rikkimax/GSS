@@ -210,7 +210,7 @@ class EventManager {
      * @param context Who called this trigger.
      * @param pass Anything required to pass to the events.
      */
-    void trigger(String key, Object context, Object... pass) {
+    synchronized void trigger(String key, Object context, Object... pass) {
         List<Event> events = getEvents(key);
         events.each {event ->
             event.run(key, context, pass);
