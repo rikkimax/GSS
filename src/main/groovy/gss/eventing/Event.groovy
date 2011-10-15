@@ -27,6 +27,8 @@
 
 package gss.eventing
 
+import gss.run.Booter
+
 /**
  * An overideable class for use with the EventManager
  */
@@ -50,8 +52,9 @@ abstract class Event {
     /**
      * During creation or assimulation with a key to this event this gets called.
      * @param key The key being assimulated to.
+     * @param booter The booter that started this application.
      */
-    abstract void create(String key);
+    abstract void create(String key, Booter booter);
 
     /**
      * During destruction or deasimulation of an even to a key this method gets called.

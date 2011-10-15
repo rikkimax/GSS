@@ -28,6 +28,7 @@
 package gss.eventing
 
 import java.util.logging.Logger
+import gss.run.Booter
 
 /**
  * This class represents an unknown event or something that occured..
@@ -35,6 +36,12 @@ import java.util.logging.Logger
  */
 class UnknownEvent extends Event {
 
+    /**
+     * Run of an event code
+     * @param trigger The trigger key that was used.
+     * @param context Who triggered this trigger.
+     * @param passed Any passed data provided by the trigger.
+     */
     @Override
     void run(String trigger, Object context, Object[] passed) {
         Logger.getLogger(UnknownEvent.class.getName()).warning("Unknown event triggered...");
@@ -42,10 +49,19 @@ class UnknownEvent extends Event {
         Logger.getLogger(UnknownEvent.class.getName()).warning("Passed values: [${passed}]");
     }
 
+    /**
+     * During creation or assimulation with a key to this event this gets called.
+     * @param key The key being assimulated to.
+     * @param booter The booter that started this application.
+     */
     @Override
-    void create(String key) {
+    void create(String key, Booter booter) {
     }
 
+    /**
+     * During destruction or deasimulation of an even to a key this method gets called.
+     * @param key The key being deasimulated to.
+     */
     @Override
     void destroy(String key) {
     }

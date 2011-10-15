@@ -28,6 +28,7 @@
 package gss.eventing
 
 import java.util.concurrent.ConcurrentHashMap
+import gss.run.Booter
 
 /**
  * This class provides an event manager handling the Event class with triggers.
@@ -36,7 +37,20 @@ class EventManager {
     /**
      * A list of Events to keys.
      */
-    private static ConcurrentHashMap<String, ArrayList<Event>> events = new ConcurrentHashMap<String, ArrayList<Event>>();
+    private ConcurrentHashMap<String, ArrayList<Event>> events = new ConcurrentHashMap<String, ArrayList<Event>>();
+
+    /**
+     * We really should also pass the booter to the event when its created
+     */
+    private Booter booter;
+
+    /**
+     * Lets create a new EventManager.
+     * @param booter The booter that started this whole thing.
+     */
+    EventManager(Booter booter) {
+        this.booter = booter;
+    }
 
     /**
      * Adds an event.
@@ -46,7 +60,7 @@ class EventManager {
     void addEvent(String key, Event event) {
         if (!getEvents(key).contains(event)) {
             getEvents(key).add(event);
-            event.create(key);
+            event.create(key, booter);
         }
     }
 

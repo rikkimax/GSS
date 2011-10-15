@@ -29,3 +29,33 @@ package gss.run
 /**
  * For when tests just need an output and can be deleted afterwards...
  */
+
+/*import gss.eventing.UnknownEvent
+
+class test extends Booter {
+    public static void main(String[] args) {
+       new test().boot(args);
+    }
+
+    @Override
+    void startup() {
+        if (keepGoingStartUp)
+            startUpEventManager();
+        eventManager.trigger(UnknownEvent.class, this, "Just for the lolz");
+    }
+
+    @Override
+    String getType() {
+        return "login";
+    }
+}*/
+/*class test {
+    public static void main(String[] args) {
+        LoginNode.main([] as String);
+        Thread.start() {
+            while(true) {
+                sleep(1000);
+            }
+        }
+    }
+}*/

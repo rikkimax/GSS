@@ -166,7 +166,7 @@ abstract class Booter {
      * Set up the event manager from configuration.
      */
     void startUpEventManager() {
-        eventManager = new EventManager();
+        eventManager = new EventManager(this);
         FileObject eventsFO = config.getDirectory().resolveFile(getType())?.resolveFile("events.yml");
         if (eventsFO?.exists()) {
             //Our type has a configuration directory and events file
