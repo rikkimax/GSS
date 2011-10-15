@@ -26,10 +26,26 @@
  */
 
 package gss.login.socket
+
+import gss.run.Booter
+import gss.run.LoginNode
 /**
  * An extended (to be implemented) class to offer an interface for connections.
  */
-class ServerSocket {
+abstract class ServerSocket {
+
+    /**
+     * Who created us.
+     */
+    protected LoginNode loginNode;
+
+    /**
+     * We need to store who created us.
+     * @param booter The booter who created us.
+     */
+    ServerSocket(LoginNode loginNode) {
+        this.loginNode = loginNode;
+    }
 
     /**
      * Get all the clients.

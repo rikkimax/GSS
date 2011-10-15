@@ -32,6 +32,7 @@ import gss.login.socket.SocketClient
 import com.esotericsoftware.kryonet.Server
 import gss.run.LoginNode
 import com.esotericsoftware.kryonet.Connection
+import gss.run.Booter
 
 /**
  * This class connects GSS networking server sockets API with KryoNet networking library.
@@ -45,13 +46,21 @@ class KryoNetServer extends ServerSocket {
     /**
      * Provides the server to listen with.
      */
-    Server server = new Server(16384, 2048, LoginNode.getConfig().getKryo());
+    Server server = new Server(16384, 2048, loginNode.getConfig().getKryo());
     /**
      * Provides a link function to the received function in this class.
      * Allows for dynamic function listening.
      * With clean IDE integration.
      */
     private def clojureReceived = Eval.x(this, "return new com.esotericsoftware.kryonet.Listener() {public void received(com.esotericsoftware.kryonet.Connection connection, Object object) {x.received(connection, object);}};");
+
+    /**
+     * We need to store who created us.
+     * @param booter The booter who created us.
+     */
+    KryoNetServer (LoginNode loginNode) {
+        super(loginNode);
+    }
 
     /**
      * Get all clients currently connected in a SocketClient interface (wrapper).
@@ -122,11 +131,11 @@ class KryoNetServer extends ServerSocket {
             simpleID = values.get("simpleid");
         if (tcp != null && udp != null)
             server.bind(tcp, udp);
-        else if (tcp != null && udp == null)
+        else if (tcp != null)
             server.bind(tcp);
         else
         //we are invalid so lets remove it from list...
-            LoginNode.getServers().removeSocket(this);
+            loginNode.getServers().removeSocket(this);
     }
 
     /**
