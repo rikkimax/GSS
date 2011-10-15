@@ -30,7 +30,7 @@ package gss.eventing
 /**
  * An overideable class for use with the EventManager
  */
-class Event {
+abstract class Event {
 
     /**
      *
@@ -40,28 +40,22 @@ class Event {
     }
 
     /**
-     * Overidden method to provide code to execute.
+     * Run of an event code
      * @param trigger The trigger key that was used.
      * @param context Who triggered this trigger.
      * @param passed Any passed data provided by the trigger.
      */
-    void run(String trigger, Object context, Object[] passed) {
-
-    }
+    abstract void run(String trigger, Object context, Object[] passed);
 
     /**
      * During creation or assimulation with a key to this event this gets called.
      * @param key The key being assimulated to.
      */
-    void create(String key) {
-
-    }
+    abstract void create(String key);
 
     /**
      * During destruction or deasimulation of an even to a key this method gets called.
      * @param key The key being deasimulated to.
      */
-    void destroy(String key) {
-
-    }
+    abstract void destroy(String key);
 }
