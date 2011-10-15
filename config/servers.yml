@@ -41,7 +41,7 @@
         port: 7782
         pass: # A password here
         other:
-            directory:{game}/{version}
+            directory: {gameVersion}
             # I'm just guessing.. for a multi game storage content server with different versions
 
     -   # Processing server (custom made)
