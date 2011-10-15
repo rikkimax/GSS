@@ -39,23 +39,32 @@ import com.esotericsoftware.kryo.Kryo
  * The purpose of this class is to provide a means in which configuration of the GSS framework is defined and stored.
  */
 class Config {
+
     /**
      *  The working directory where the configuration files are present.
      */
     private FileObject directory;
+
     /**
      * A list of servers to be used by this instance, created from configuration files.
      */
     private ArrayList<gss.config.Server> servers;
+
     /**
      * Annotation configuration for Hibernate for working with classes defined in configuration file.
      */
     private AnnotationConfiguration annotationConfiguration;
+
     /**
      * Kryo serializer to be used with KryoNet server connector.
      * Classes are loaded from configuration file and should be identifical to annotationConfiguration.
      */
     private Kryo kryo;
+
+    /**
+     * A list of serialized classes to use with e.g. Hibernate, Kryo.
+     */
+    private List<String> serializedClasses;
 
     /**
      * Set the current working directory of the configuration files
@@ -85,8 +94,8 @@ class Config {
         servers = yaml.load(directory.resolveFile("servers.yml").getContent().getInputStream(), Server.class);
         Map common = yaml.load(directory.resolveFile("common.yml").getContent().getInputStream());
         //lets dyanamically set which classes will be used for the database
-        List serializedClasses = common.get("SerializedClasses");
-        setupHibernateFactory(serializedClasses);
+        serializedClasses = common.get("SerializedClasses");
+        setupHibernateFactory();
     }
 
     /**
@@ -100,13 +109,12 @@ class Config {
     /**
      * Create and configures AnnotationConfiguration for use with Hibernate as well as registers the serialized classes
      * to Kryo and AnnotationConfiguration.
-     * @param serializedClasses The serialized classes that can be used.
      */
-    void setupHibernateFactory(List serializedClasses) {
+    void setupHibernateFactory() {
         kryo = new Kryo();
         annotationConfiguration = new AnnotationConfiguration();
-        for (String s: serializedClasses) {
-            Class clasz = Eval.me("return " + s + ".class;");
+        serializedClasses.each {
+            Class clasz = Eval.me("return ${it}.class;");
             kryo.register(clasz);
             Logger.getLogger(this.getClass().getName()).info("Adding class " + clasz + " to annotated list");
             annotationConfiguration.addAnnotatedClass(clasz);
@@ -127,5 +135,13 @@ class Config {
      */
     final Kryo getKryo() {
         return kryo;
+    }
+
+    /**
+     * Get a list of  serialized classes to use with e.g. Hibernate, Kryo.
+     * @return A list of serialized classes to use with e.g. Hibernate, Kryo.
+     */
+    List<String> getSerializedClasses() {
+        return serializedClasses;
     }
 }
