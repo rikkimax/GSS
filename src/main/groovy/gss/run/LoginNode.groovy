@@ -45,16 +45,38 @@ import gss.login.Servers
 class LoginNode extends Booter {
 
     /**
+     * What type of node is this?
+     */
+    public final String type = "login";
+
+    /**
      * All the servers available from configuration file.
      */
-    private static Servers servers;
+    private Servers servers;
+
+    /**
+     * Lets store a copy of this booter instance...
+     *
+     */
+    private static LoginNode instance;
+
+    /**
+     * Start up initiation method but as a singleton..
+     * @param args Arguments given to application
+     */
+    static void main(String... args) {
+        if (instance == null) {
+            instance = new LoginNode();
+            instance.boot(args);
+        }
+    }
 
     /**
      * An overidden method to provide extra start up procedures.
      */
-    static void startup() {
-       if (keepGoingStartUp)
-            startUpDataBase();
+    @Override
+    void startup() {
+        super;
         if (keepGoingStartUp)
             startUpServers();
     }
@@ -62,7 +84,7 @@ class LoginNode extends Booter {
     /**
      * Starts up server connectors from configuration.
      */
-    static void startUpServers() {
+    void startUpServers() {
         //find current server details from config
         servers = new Servers();
         Server current;
@@ -76,13 +98,14 @@ class LoginNode extends Booter {
         for (String serverClass: serversConfig.keySet()) {
             ArrayList<HashMap<Object, Object>> values = serversConfig.get(serverClass);
             Class serverClassReflected = Eval.me("return " + serverClass + ".class");
-            println(serverClassReflected);
             if (serverClassReflected != null) {
-                if (serverClassReflected.newInstance() instanceof ServerSocket) {
+                Object serverClassObject = Eval.x(this, "return new " + serverClass + "(x);");
+                if (serverClassObject instanceof ServerSocket) {
                     for (HashMap<Object> serverValue: values) {
-                        ServerSocket serverConnector = serverClassReflected.newInstance();
+                        ServerSocket serverConnector = serverClassObject;
                         serverConnector.setValues(serverValue);
                         servers.addSocket(serverConnector);
+                        println("Started ---" + serverConnector);
                     }
                 }
             }
@@ -94,7 +117,15 @@ class LoginNode extends Booter {
      * Gets the servers connectors.
      * @return The servers connectors.
      */
-    static Servers getServers() {
+    Servers getServers() {
         return servers;
+    }
+
+    /**
+     * Lets get the instance of this booter.
+     * @return The instance of this booter.
+     */
+    LoginNode getInstance() {
+        return instance;
     }
 }

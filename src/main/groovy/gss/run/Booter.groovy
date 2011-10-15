@@ -36,32 +36,51 @@ import gss.config.Server
 import org.hibernate.SessionFactory
 import javax.persistence.EntityManager
 import org.hibernate.Session
+import gss.eventing.EventManager
+import org.apache.commons.vfs.FileObject
+import org.yaml.snakeyaml.Yaml
 
 /**
  * The point of this class is to provide a generic booter to be extended.
  */
-class Booter {
+abstract class Booter {
 
     /**
      * Do we keep the application start up process going?
      */
-    private static Boolean keepGoingStartUp = true;
+    protected Boolean keepGoingStartUp = true;
 
     /**
      * The configuration class
      */
-    private static Config config;
+    protected Config config;
 
     /**
      * Hibernate configuration for the session.
      */
-    private static SessionFactory sessionFactory;
+    protected SessionFactory sessionFactory;
+
+    /**
+     * Event manager essentially associates a key(s) to event class(es).
+     */
+    protected EventManager eventManager;
+
+    /**
+     * What type of node is this?
+     */
+    public final String type = "Booter";
+
+    /**
+     * Lets do nothing in this constructor...
+     */
+    Booter() {
+    }
 
     /**
      * Start up initiation method
      * @param args Arguments given to application
      */
-    static void main(String... args) {
+    void boot(String... args) {
         Logger.getLogger("gss.Booter").setLevel(Level.ALL);
         OptionParser optionParser = new OptionParser();
         optionsAdd(optionParser);
@@ -83,7 +102,7 @@ class Booter {
      * This method adds options to use.
      * @param op The OptionParser.
      */
-    static void optionsAdd(OptionParser op) {
+    void optionsAdd(OptionParser op) {
         op.acceptsAll(["help", "?"], "Help information");
         op.acceptsAll(["configDir", "c"], "Configuration directory").withRequiredArg().ofType(File.class).defaultsTo(new File("config"));
     }
@@ -93,7 +112,7 @@ class Booter {
      * @param optionParser The parser class.
      * @param optionSet The options given.
      */
-    static void parseArguments(OptionParser optionParser, OptionSet optionSet) {
+    void parseArguments(OptionParser optionParser, OptionSet optionSet) {
         File configDir = ((File) optionSet.valueOf("configDir"));
         configDir.mkdirs();
         if (configDir.exists()) {
@@ -103,21 +122,21 @@ class Booter {
             Logger.getLogger(Booter.class.getName()).severe("Cannot continue configuration directory does not exist and cannot!\n" + configDir.getAbsolutePath());
             keepGoingStartUp = false;
         }
-        config.load();
+        if (keepGoingStartUp)
+            config.load();
     }
 
     /**
      * Calls other methods upon start up.
      */
-    static void startup() {
-        if (keepGoingStartUp)
-            startUpDataBase();
-    }
+    abstract void startup()
+
+    ;
 
     /**
      * Set up Hibernate for database access.
      */
-    static void startUpDataBase() {
+    void startUpDataBase() {
         //find database server details from config
         Server database;
         HashMap configH = new HashMap();
@@ -144,10 +163,29 @@ class Booter {
     }
 
     /**
+     * Set up the event manager from configuration.
+     */
+    void startUpEventManager() {
+        FileObject eventsFO = config.getDirectory().getChild(type)?.getChild("events.yml");
+        Logger.getLogger("gss.run.Booter").info(type);
+        if (eventsFO?.exists()) {
+            //Our type has a configuration directory and events file
+            Yaml yaml = new Yaml();
+            List<HashMap<String, List<String>>> content = yaml.load(eventsFO.content.inputStream);
+            println(content);
+            println(content);
+            println(content);
+        } else {
+            //We have a big problem here...
+            //we don't have our own events file great
+        }
+    }
+
+    /**
      * Get the configuration class.
      * @return The config class instance.
      */
-    static Config getConfig() {
+    Config getConfig() {
         return config;
     }
 
@@ -155,7 +193,7 @@ class Booter {
      * Get the entity manager for Hibernate.
      * @return The entity manager.
      */
-    static EntityManager getEntityManager() {
+    EntityManager getEntityManager() {
         return entityManager;
     }
 
@@ -163,8 +201,16 @@ class Booter {
      * Get a new session to be used for Hibernate.
      * @return A new session to be used for Hibernate.
      */
-    static Session getSession() {
+    Session getSession() {
         //give us a new session that is opened so we can work with the database
         return sessionFactory.openSession();
+    }
+
+    /**
+     * Gets the event manager.
+     * @return The event manager.
+     */
+    EventManager getEventManager() {
+        return eventManager;
     }
 }
