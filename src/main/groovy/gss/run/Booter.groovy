@@ -66,11 +66,6 @@ abstract class Booter {
     protected EventManager eventManager;
 
     /**
-     * What type of node is this?
-     */
-    public final String type = "Booter";
-
-    /**
      * Lets do nothing in this constructor...
      */
     Booter() {
@@ -129,9 +124,12 @@ abstract class Booter {
     /**
      * Calls other methods upon start up.
      */
-    abstract void startup()
-
-    ;
+    void startup() {
+        if (keepGoingStartUp)
+            startUpEventManager();
+        if (keepGoingStartUp)
+            startUpDataBase();
+    }
 
     /**
      * Set up Hibernate for database access.
@@ -166,15 +164,12 @@ abstract class Booter {
      * Set up the event manager from configuration.
      */
     void startUpEventManager() {
-        FileObject eventsFO = config.getDirectory().getChild(type)?.getChild("events.yml");
-        Logger.getLogger("gss.run.Booter").info(type);
+        FileObject eventsFO = config.getDirectory().resolveFile(getType())?.resolveFile("events.yml");
+        println(eventsFO);
         if (eventsFO?.exists()) {
             //Our type has a configuration directory and events file
             Yaml yaml = new Yaml();
             List<HashMap<String, List<String>>> content = yaml.load(eventsFO.content.inputStream);
-            println(content);
-            println(content);
-            println(content);
         } else {
             //We have a big problem here...
             //we don't have our own events file great
@@ -212,5 +207,13 @@ abstract class Booter {
      */
     EventManager getEventManager() {
         return eventManager;
+    }
+
+    /**
+     * Get the type of the server
+     * @return The type of the server
+     */
+    String getType(){
+        return "booter";
     }
 }

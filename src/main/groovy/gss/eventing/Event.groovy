@@ -41,10 +41,11 @@ class Event {
 
     /**
      * Overidden method to provide code to execute.
-     * @param trigger The triggor key that was used.
+     * @param trigger The trigger key that was used.
+     * @param context Who triggered this trigger.
      * @param passed Any passed data provided by the trigger.
      */
-    void run(String trigger, Object[] passed) {
+    void run(String trigger, Object context, Object[] passed) {
 
     }
 

@@ -38,6 +38,10 @@ public class LoginTest {
     @Test
     public void testHelp() {
         LoginNode.main("");
+    }
+
+    @Test
+    public void testHelp2() {
         LoginNode.main("--help");
     }
 }

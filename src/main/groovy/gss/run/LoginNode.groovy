@@ -45,11 +45,6 @@ import gss.login.Servers
 class LoginNode extends Booter {
 
     /**
-     * What type of node is this?
-     */
-    public final String type = "login";
-
-    /**
      * All the servers available from configuration file.
      */
     private Servers servers;
@@ -76,7 +71,7 @@ class LoginNode extends Booter {
      */
     @Override
     void startup() {
-        super;
+        super.startup();
         if (keepGoingStartUp)
             startUpServers();
     }
@@ -127,5 +122,14 @@ class LoginNode extends Booter {
      */
     LoginNode getInstance() {
         return instance;
+    }
+
+    /**
+     * Get the type of the server
+     * @return The type of the server
+     */
+    @Override
+    String getType() {
+        return "login";
     }
 }

@@ -193,11 +193,12 @@ class EventManager {
     /**
      * Triggers a list of events.
      * @param key The key to use as trigger.
+     * @param context Who called this trigger.
      * @param pass Anything required to pass to the events.
      */
-    void trigger(String key, Object... pass) {
+    void trigger(String key, Object context, Object... pass) {
         for (Event event: getEvents(key)) {
-            event.run(key, pass);
+            event.run(key, context, pass);
         }
     }
 }
