@@ -311,7 +311,7 @@ class ScriptedEventManager {
      * Checks for any obsolete cache and removes it.
      * Reloads any cache if its null.
      */
-    private void checkObsoleteCache() {
+    public synchronized void checkObsoleteCache() {
         // Remove out all the unneeded cache...
         eventsObjects.each {fileObject, cache ->
             if (containsEventFile(fileObject)) {
