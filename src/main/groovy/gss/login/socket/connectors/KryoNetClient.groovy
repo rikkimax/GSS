@@ -136,8 +136,7 @@ class KryoNetClient extends SocketClient {
             }
             String out = parts[parts.size() - 1] + parts[0] + parts[(int) (parts.length / 2)];
             parts.each {
-                if (!out.contains(it))
-                    out += it;
+                out += it;
             }
             return out;
         }
