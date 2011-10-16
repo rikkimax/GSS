@@ -110,7 +110,7 @@ class KryoNetClient extends SocketClient {
      * (ip=192.168.0.1,port=34527)
      * Simple ID = 19216801.34527
      * Non simple ID =
-     * 19216801.34527 -> 72543.10861291 -> kryo.72543.10861291 -> kry o.7 254 3.1 086 129 1 -> 1kry3.10.7254086129
+     * 19216801.34527 -> 72543.10861291 -> kryo.72543.10861291 -> kry o.7 254 3.1 086 129 1 -> 1kry3.1o.7254086129
      * @return The string containing the ID of the connection.
      */
     String getID() {
