@@ -278,7 +278,7 @@ class ScriptedEventManager {
     private void checkObsoleteCache() {
         // Remove out all the unneeded cache...
         eventsObjects.each {fileObject, cache ->
-            if (!eventsFiles.containsValue(fileObject)) {
+            if (containsEventFile(fileObject)) {
                 cache.destroy("");
                 eventsObjects.remove(fileObject);
             }
