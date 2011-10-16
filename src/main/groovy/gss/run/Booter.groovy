@@ -36,12 +36,12 @@ import gss.config.Server
 import org.hibernate.SessionFactory
 import javax.persistence.EntityManager
 import org.hibernate.Session
-import gss.eventing.EventManager
 import org.apache.commons.vfs.FileObject
 import org.yaml.snakeyaml.Yaml
 import gss.eventing.Event
 import gss.eventing.UnknownEvent
 import org.apache.commons.vfs.VFS
+import gss.eventing.EventManagerHandler
 
 /**
  * The point of this class is to provide a generic booter to be extended.
@@ -66,7 +66,7 @@ abstract class Booter {
     /**
      * Event manager essentially associates a key(s) to event class(es).
      */
-    protected EventManager eventManager;
+    protected EventManagerHandler eventManager;
 
     protected File workingDir;
     /**
@@ -170,7 +170,7 @@ abstract class Booter {
      * Set up the event manager from configuration.
      */
     void startUpEventManager() {
-        eventManager = new EventManager(this);
+        eventManager = new EventManagerHandler(this);
         FileObject eventsFO = config.getDirectory().resolveFile(getType())?.resolveFile("events.yml");
         if (eventsFO?.exists()) {
             //Our type has a configuration directory and events file
@@ -204,6 +204,7 @@ abstract class Booter {
             if (toTrigger)
                 eventManager.addEvent(it, new UnknownEvent());
         }
+        eventManager.addDirectoryMonitoring(workingDirFileObject());
     }
 
     /**
@@ -235,7 +236,7 @@ abstract class Booter {
      * Gets the event manager.
      * @return The event manager.
      */
-    EventManager getEventManager() {
+    EventManagerHandler getEventManager() {
         return eventManager;
     }
 
