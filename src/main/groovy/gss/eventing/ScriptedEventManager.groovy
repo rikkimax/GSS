@@ -159,10 +159,10 @@ class ScriptedEventManager {
      * @return The FileObject associated with the Event.
      */
     FileObject getEventFile(Event event) {
-         eventsObjects.each{fileObject, cache->
-             if (cache.getClass().getCanonicalName() == event.getClass().getCanonicalName())
+        eventsObjects.each {fileObject, cache ->
+            if (cache.getClass().getCanonicalName() == event.getClass().getCanonicalName())
                 return fileObject;
-         }
+        }
         return null;
     }
 
@@ -196,6 +196,7 @@ class ScriptedEventManager {
                 // Lets add this file to be checked for...
                 // No idea if its actually an event or not lol
                 getFiles(key).add(fileObject);
+                fileMonitor.addFile(fileObject);
                 loadClassCache(fileObject);
             }
     }
@@ -249,6 +250,19 @@ class ScriptedEventManager {
      */
     void removeEvent(String key, FileObject fileObject) {
         getFiles(key).remove(fileObject);
+    }
+
+    /**
+     * Removes an Event.
+     * @param fileObject The FileObject representing the Event.
+     */
+    void removeEvent(FileObject fileObject) {
+        eventsFiles.each {key, events ->
+            events.each {eventFile ->
+                if (eventFile == fileObject)
+                    removeEvent(key, fileObject);
+            }
+        }
     }
 
     /**
