@@ -110,7 +110,7 @@ class KryoNetClient extends SocketClient {
      * (ip=192.168.0.1,port=34527)
      * Simple ID = 19216801.34527
      * Non simple ID =
-     * 34527.19216801 -> 10861291.72543 -> kryo.10861291.72543 -> kry o.1 086 129 1.7 254 3 -> 3kry129o.10861.7254
+     * 19216801.34527 -> 72543.10861291 -> kryo.72543.10861291 -> kry o.7 254 3.1 086 129 1 -> 1kry3.10.7254086129
      * @return The string containing the ID of the connection.
      */
     String getID() {
@@ -134,7 +134,6 @@ class KryoNetClient extends SocketClient {
                 if (i % 3 == 2)
                     done++;
             }
-            println(parts);
             String out = parts[parts.size() - 1] + parts[0] + parts[(int) (parts.length / 2)];
             parts.each {
                 if (!out.contains(it))
