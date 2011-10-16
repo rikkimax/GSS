@@ -243,11 +243,7 @@ class EventManager {
      * @return If the trigger key exists.
      */
     Boolean containsTrigger(String key) {
-        events.each { trigger, events ->
-            if (trigger == key)
-                return true;
-        }
-        return false;
+        return events.containsKey(key);
     }
 
     /**
@@ -256,10 +252,6 @@ class EventManager {
      * @return If the event exists.
      */
     Boolean containsEvent(Event event) {
-        events.each { trigger, events ->
-            if (events.contains(event))
-                return true;
-        }
-        return false;
+        return events.containsValue(event);
     }
 }
