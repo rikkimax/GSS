@@ -41,6 +41,7 @@ import org.apache.commons.vfs.FileObject
 import org.yaml.snakeyaml.Yaml
 import gss.eventing.Event
 import gss.eventing.UnknownEvent
+import org.apache.commons.vfs.VFS
 
 /**
  * The point of this class is to provide a generic booter to be extended.
@@ -67,6 +68,7 @@ abstract class Booter {
      */
     protected EventManager eventManager;
 
+    protected File workingDir;
     /**
      * Lets do nothing in this constructor...
      */
@@ -102,6 +104,7 @@ abstract class Booter {
     void optionsAdd(OptionParser op) {
         op.acceptsAll(["help", "?"], "Help information");
         op.acceptsAll(["configDir", "c"], "Configuration directory").withRequiredArg().ofType(File.class).defaultsTo(new File("config"));
+        op.acceptsAll(["workingDir", "w"], "The working directory for scripts (eventing)").withRequiredArg().ofType(File.class).defaultsTo(new File("game"));
     }
 
     /**
@@ -111,6 +114,7 @@ abstract class Booter {
      */
     void parseArguments(OptionParser optionParser, OptionSet optionSet) {
         File configDir = ((File) optionSet.valueOf("configDir"));
+        workingDir = optionSet.valueOf("workingDir");
         configDir.mkdirs();
         if (configDir.exists()) {
             config.setDirectory(configDir);
@@ -236,10 +240,26 @@ abstract class Booter {
     }
 
     /**
-     * Get the type of the server
-     * @return The type of the server
+     * Get the type of the server.
+     * @return The type of the server.
      */
     String getType() {
         return "booter";
+    }
+
+    /**
+     * Gets the current working directory.
+     * @return The current working directory.
+     */
+    File getWorkingDir() {
+        return workingDir;
+    }
+
+    /**
+     * Gets the current working directory.
+     * @return The current working directory.
+     */
+    FileObject getWorkingDirFileObject() {
+        return VFS.getManager().resolveFile(workingDir.getAbsolutePath());
     }
 }

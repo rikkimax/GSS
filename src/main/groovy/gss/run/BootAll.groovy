@@ -71,8 +71,9 @@ class BootAll {
     private static void optionsAdd(OptionParser op) {
         op.acceptsAll(["help", "?"], "Help information");
         op.acceptsAll(["configDir", "c"], "Configuration directory").withRequiredArg().ofType(File.class).defaultsTo(new File("config"));
-        op.acceptsAll(["uniqueConfigDir", "ucd"], "Does each server have its own unique config directory?").withOptionalArg().ofType(Boolean.class).defaultsTo(true);
-        op.acceptsAll(["hsqldb", "db"], "Creates a HSQLDB on a speicifc port. Preferred to be used with uniqueConfigDir option as well.").withRequiredArg().ofType(Integer.class).defaultsTo(9001);
+        op.acceptsAll(["workingDir", "w"], "The working directory for scripts (eventing)").withRequiredArg().ofType(File.class).defaultsTo(new File("game"));
+        op.acceptsAll(["uniqueDirs", "ucd"], "Does each server have its own unique config directory?").withOptionalArg().ofType(Boolean.class).defaultsTo(true);
+        op.acceptsAll(["hsqldb", "db"], "Creates a HSQLDB on a speicifc port. Preferred to be used with uniqueDirs option as well.").withRequiredArg().ofType(Integer.class).defaultsTo(9001);
         op.acceptsAll(["KeepGoing", "kg"], "Creates a process dedicated to keep it running untill its forcefully stopped.");
     }
 
@@ -83,13 +84,14 @@ class BootAll {
      */
     private static void parseArguments(OptionParser optionParser, OptionSet optionSet) {
         File configDir = optionSet.valueOf("configDir");
-        Boolean uniqueConfigDir = optionSet.valueOf("uniqueConfigDir");
-        parseArgumentsDataBase(optionParser, optionSet, configDir, uniqueConfigDir);
-        if (!uniqueConfigDir) {
+        File workingDir = optionSet.valueOf("workingDir");
+        Boolean uniqueDirs = optionSet.valueOf("uniqueDirs");
+        parseArgumentsDataBase(optionParser, optionSet, configDir, uniqueDirs);
+        if (!uniqueDirs) {
             if (optionSet.nonOptionArguments().size() > 1 || (optionSet.nonOptionArguments().size() == 1 && optionSet.has("hsqldb")))
                 Logger.getLogger("gss.BootAll").severe("There is more then 1 server node operational configuration will be corrupt for doing this.");
         }
-        parseArgumentsNodes(optionParser, optionSet, configDir, uniqueConfigDir);
+        parseArgumentsNodes(optionParser, optionSet, configDir, workingDir, uniqueDirs);
         parseArgumentsKeepGoing(optionParser, optionSet);
     }
 
@@ -98,17 +100,17 @@ class BootAll {
      * @param optionParser The parser class.
      * @param optionSet The options given.
      * @param configDir Configuration directory.
-     * @param uniqueConfigDir Do we use a unique directory folder structure?
+     * @param uniqueDirs Do we use a unique directory folder structure?
      */
-    private static void parseArgumentsDataBase(OptionParser optionParser, OptionSet optionSet, File configDir, Boolean uniqueConfigDir) {
+    private static void parseArgumentsDataBase(OptionParser optionParser, OptionSet optionSet, File configDir, Boolean uniqueDirs) {
         if (optionSet.has("hsqldb")) {
-            if (!uniqueConfigDir)
-                Logger.getLogger("gss.BootAll").warning("Database server should be ran either by itself or with uniqueConfigDir on.");
+            if (!uniqueDirs)
+                Logger.getLogger("gss.BootAll").warning("Database server should be ran either by itself or with uniqueDirs on.");
             Thread.start {
-                File tempUniqueConfigDir = new File(configDir.getAbsolutePath().replace("\\", "/") + "hsqldb/");
+                File tempUniqueDirs = new File(configDir.getAbsolutePath().replace("\\", "/") + "hsqldb/");
                 Logger.getLogger("gss.BootAll").info("Creating database server");
-                if (uniqueConfigDir)
-                    Server.main(["-database", tempUniqueConfigDir, "-port " + optionSet.valueOf("hsqldb")]);
+                if (uniqueDirs)
+                    Server.main(["-database", tempUniqueDirs, "-port " + optionSet.valueOf("hsqldb")]);
                 else
                     Server.main(["-database", configDir, "-port " + optionSet.valueOf("hsqldb")]);
             }
@@ -135,9 +137,10 @@ class BootAll {
      * @param optionParser The parser class.
      * @param optionSet The options given.
      * @param configDir Configuration directory.
-     * @param uniqueConfigDir Do we use a unique directory folder structure?
+     * @param workingDir The working directory of the nodes.
+     * @param uniqueDirs Do we use a unique directory folder structure?
      */
-    private static void parseArgumentsNodes(OptionParser optionParser, OptionSet optionSet, File configDir, Boolean uniqueConfigDir) {
+    private static void parseArgumentsNodes(OptionParser optionParser, OptionSet optionSet, File configDir, File workingDir, Boolean uniqueDirs) {
         Map<String, Integer> countUsed = new HashMap<String, Integer>();
         countUsed.put("login", 0);
         optionSet.nonOptionArguments().each {
@@ -145,16 +148,17 @@ class BootAll {
             String extension = "";
             if (countUsed.get(type) > 0)
                 extension = "_" + countUsed.get(type) + "";
-            File tempUniqueConfigDir = new File(configDir.getAbsolutePath().replace("\\", "/") + type + extension + "/");
+            File tempConfigUniqueDirs = new File(configDir.getAbsolutePath().replace("\\", "/") + type + extension + "/");
+            File tempWorkingUniqueDirs = new File(workingDir.getAbsolutePath().replace("\\", "/") + type + extension + "/");
             switch (type) {
                 case "login":
                     Logger.getLogger("gss.BootAll").info("Creating login type node");
                     countUsed.put(type, countUsed.get(type) + 1);
                     Thread.start {
-                        if (uniqueConfigDir)
-                            LoginNode.main("--configDir=${tempUniqueConfigDir}");
+                        if (uniqueDirs)
+                            LoginNode.main("--configDir=${tempConfigUniqueDirs} --workingDir=${tempWorkingUniqueDirs}");
                         else
-                            LoginNode.main("--configDir=${configDir}");
+                            LoginNode.main("--configDir=${configDir} --workingDir=${workingDir}");
                     }
                     break;
                 default:

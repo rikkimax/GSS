@@ -26,36 +26,18 @@
  */
 
 package gss.run
+
+import gss.eventing.ScriptedEventManager
+import org.apache.commons.vfs.VFS
+import org.apache.commons.vfs.FileObject
+
 /**
  * For when tests just need an output and can be deleted afterwards...
  */
+File location = new File("C:\\cygwin\\home\\rikki\\GSS_TEST");
+FileObject currentDir = VFS.getManager().resolveFile(location.getAbsolutePath());
+FileObject testEvent = currentDir.resolveFile("TestEvent.groovy");
 
-/*import gss.eventing.UnknownEvent
-
-class test extends Booter {
-    public static void main(String[] args) {
-       new test().boot(args);
-    }
-
-    @Override
-    void startup() {
-        if (keepGoingStartUp)
-            startUpEventManager();
-        eventManager.trigger(UnknownEvent.class, this, "Just for the lolz");
-    }
-
-    @Override
-    String getType() {
-        return "login";
-    }
-}*/
-/*class test {
-    public static void main(String[] args) {
-        LoginNode.main([] as String);
-        Thread.start() {
-            while(true) {
-                sleep(1000);
-            }
-        }
-    }
-}*/
+ScriptedEventManager scriptedEventManager = new ScriptedEventManager(null);
+scriptedEventManager.addEvent("TestEvent", testEvent);
+scriptedEventManager.trigger("TestEvent", null, "For the lulz");
