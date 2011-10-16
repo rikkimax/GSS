@@ -101,6 +101,16 @@ class ScriptedEventManager {
             }
         });
         fileMonitor.start();
+
+        /**
+         * Check to see it we have any rubbish floating around...
+         */
+        Thread.start {
+            while (true) {
+                checkObsoleteCache();
+                sleep 1000;
+            }
+        }
     }
 
     /**
@@ -139,6 +149,24 @@ class ScriptedEventManager {
      * @param key The trigger key to use.
      * @param fileObject The event file to use.
      */
+    void addEvent(Object key, FileObject fileObject) {
+        addEvent(key.getClass(), fileObject);
+    }
+
+    /**
+     * Add an event to the manager.
+     * @param key The trigger key to use.
+     * @param fileObject The event file to use.
+     */
+    void addEvent(Class key, FileObject fileObject) {
+        addEvent(key.getCanonicalName(), fileObject);
+    }
+
+    /**
+     * Add an event to the manager.
+     * @param key The trigger key to use.
+     * @param fileObject The event file to use.
+     */
     void addEvent(String key, FileObject fileObject) {
         if (fileObject.exists())
             if (fileObject.type == FileType.FILE) {
@@ -148,6 +176,57 @@ class ScriptedEventManager {
                 getFiles(key).add(fileObject);
                 loadClassCache(fileObject);
             }
+    }
+
+    /**
+     * Removes all events for a trigger.
+     * @param key The key to use.
+     */
+    void removeEvent(String key) {
+        eventsFiles.remove(key);
+    }
+
+    /**
+     * Removes all events for a trigger.
+     * @param key The key to use.
+     */
+    void removeEvent(Class key) {
+        removeEvent(key.getCanonicalName());
+    }
+
+    /**
+     * Removes all events for a trigger.
+     * @param key The key to use.
+     */
+    void removeEvent(Object key) {
+        removeEvent(key.getClass());
+    }
+
+    /**
+     * Removes an event from a trigger.
+     * @param key The key to use as trigger.
+     * @param event The event to remove.
+     */
+    void removeEvent(Class key, FileObject fileObject) {
+        removeEvent(key.getCanonicalName(), fileObject);
+    }
+
+    /**
+     * Removes an event from a trigger.
+     * @param key The key to use as trigger.
+     * @param event The event to remove.
+     */
+    void removeEvent(Object key, FileObject fileObject) {
+        removeEvent(key.getClass(), fileObject);
+    }
+
+    /**
+     * Removes an event from a trigger.
+     * @param key The key to use as trigger.
+     * @param event The event to remove.
+     */
+    void removeEvent(String key, FileObject fileObject) {
+        getFiles(key).remove(fileObject);
     }
 
     /**
@@ -171,7 +250,7 @@ class ScriptedEventManager {
      */
     private void reloadCache() {
         gcl.clearCache();
-        eventsFiles.each {keys, eventsList ->
+        eventsFiles.each {key, eventsList ->
             eventsList.each {eventFile ->
                 Object returned = gcl.parseClass(eventFile.content.inputStream);
                 boolean failed = true;
@@ -180,6 +259,7 @@ class ScriptedEventManager {
                         Object returnedObject = returned.newInstance();
                         if (returnedObject instanceof Event) {
                             eventsObjects.put(eventFile, returnedObject);
+                            returnedObject.create(key, booter);
                             failed = false;
                             Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Loaded " + returnedObject.getClass().getName() + " into cache");
                         }
@@ -188,19 +268,35 @@ class ScriptedEventManager {
                     Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Failed to load " + eventFile + " into cache");
             }
         }
+        checkObsoleteCache();
+    }
+
+    /**
+     * Checks for any obsolete cache and removes it.
+     * Reloads any cache if its null.
+     */
+    private void checkObsoleteCache() {
+        // Remove out all the unneeded cache...
         eventsObjects.each {fileObject, cache ->
             if (!eventsFiles.containsValue(fileObject)) {
+                cache.destroy("");
                 eventsObjects.remove(fileObject);
             }
         }
+        // Trys to load some cache for a class...
+        eventsFiles.each {key, eventsList ->
+            eventsList.each {eventFile ->
+                if (eventsObjects.get(eventFile) == null)
+                    loadClassCache(eventFile);
+            }
+        }
     }
-
     /**
      * Load a class into cache.
      * @param fileObject The file to try and load.
      */
     private void loadClassCache(FileObject fileObject) {
-        eventsFiles.each {keys, eventsList ->
+        eventsFiles.each {key, eventsList ->
             eventsList.each {eventFile ->
                 if (eventFile.getURL() == fileObject.getURL()) {
                     Object returned = gcl.parseClass(eventFile.content.inputStream);
@@ -210,6 +306,7 @@ class ScriptedEventManager {
                             Object returnedObject = returned.newInstance();
                             if (returnedObject instanceof Event) {
                                 eventsObjects.put(eventFile, returnedObject);
+                                returnedObject.create(key, booter);
                                 failed = false;
                                 Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Loaded " + returnedObject.getClass().getName() + " into cache");
                             }
@@ -252,5 +349,71 @@ class ScriptedEventManager {
      */
     void trigger(Object key, Object context, Object... pass) {
         trigger(key.getClass(), context, pass);
+    }
+
+    /**
+     * Does the trigger exist?
+     * @param key The trigger key.
+     * @return If the trigger key exists.
+     */
+    Boolean containsTrigger(Class key) {
+        return containsTrigger(key.getCanonicalName());
+    }
+
+    /**
+     * Does the trigger exist?
+     * @param key The trigger key.
+     * @return If the trigger key exists.
+     */
+    Boolean containsTrigger(Object key) {
+        return containsTrigger(key.getClass());
+    }
+
+    /**
+     * Does the trigger exist?
+     * @param key The trigger key.
+     * @return If the trigger key exists.
+     */
+    Boolean containsTrigger(String key) {
+        return eventsFiles.containsKey(key);
+    }
+
+    /**
+     * Does the event FileObject exist?
+     * @param event The event.
+     * @return If the event exists.
+     */
+    Boolean containsEventFile(FileObject fileObject) {
+        return eventsFiles.containsValue(fileObject);
+    }
+
+    /**
+     * Does the event exist?
+     * @param event The event.
+     * @return If the event exists.
+     */
+    Boolean containsEvent(Event event) {
+        eventsObjects.each {key, cache ->
+            if (cache == event)
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Does the trigger have the event?
+     * @param key The trigger.
+     * @param event The event.
+     * @return If the event exists.
+     */
+    Boolean containsEvent(String key, Event event) {
+        eventsObjects.each {eventFile, cache ->
+            if (cache == event)
+                eventsFiles.each {key3, eventFile2 ->
+                    if (eventFile2 == eventFile && key == key3)
+                        return true;
+                }
+        }
+        return false;
     }
 }
