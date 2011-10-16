@@ -144,8 +144,26 @@ class ScriptedEventManager {
         return ret;
     }
 
+    /**
+     * Gets the event associated with the FileObject.
+     * @param fileObject The FileObject to get the association of.
+     * @return The event associated with the FileObject.
+     */
     Event getEvent(FileObject fileObject) {
         return eventsObjects.get(fileObject);
+    }
+
+    /**
+     * Gets the FileObject associated with the Event.
+     * @param event The FileObject to get the association of.
+     * @return The FileObject associated with the Event.
+     */
+    FileObject getEventFile(Event event) {
+         eventsObjects.each{fileObject, cache->
+             if (cache.getClass().getCanonicalName() == event.getClass().getCanonicalName())
+                return fileObject;
+         }
+        return null;
     }
 
     /**
