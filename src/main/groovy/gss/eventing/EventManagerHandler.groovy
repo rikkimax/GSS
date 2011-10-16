@@ -29,6 +29,11 @@ package gss.eventing
 
 import gss.run.Booter
 import org.apache.commons.vfs.FileObject
+import org.apache.commons.vfs.impl.DefaultFileMonitor
+import org.apache.commons.vfs.FileListener
+import org.apache.commons.vfs.FileChangeEvent
+import org.apache.commons.vfs.FileType
+import java.util.logging.Logger
 
 /**
  * This class is responsible for merging EventManager and ScriptedEventManager.
@@ -48,6 +53,16 @@ class EventManagerHandler {
     private Booter booter;
 
     /**
+     * A file monitor to check for changes in file system.
+     */
+    private DefaultFileMonitor fileMonitor;
+
+    /**
+     * A function for use with the file monitor.
+     */
+    private def fileMonitorFunction;
+
+    /**
      * Initiation method of this class.
      * @param booter The booter that started this application.
      */
@@ -55,6 +70,43 @@ class EventManagerHandler {
         this.booter = booter;
         scriptedEventManager = new ScriptedEventManager(booter);
         eventManager = new EventManager();
+        /**
+         * Listen for when file changes occur.
+         */
+        fileMonitorFunction = new FileListener() {
+            /**
+             * On file creation tell us.
+             * @param fileChangeEvent The file change.
+             */
+            void fileCreated(FileChangeEvent fileChangeEvent) {
+                if (fileChangeEvent.file.type == FileType.FILE)
+                    if (fileChangeEvent.file.getName().extension == "groovy")
+                        addEvent(UnknownEvent.class, fileChangeEvent.file);
+            }
+
+            /**
+             * On file deletion tell us.
+             * @param fileChangeEvent The file change.
+             */
+            void fileDeleted(FileChangeEvent fileChangeEvent) {
+                if (fileChangeEvent.file.type == FileType.FILE)
+                    if (fileChangeEvent.file.getName().extension == "groovy")
+                        removeEvent(fileChangeEvent.getFile());
+            }
+
+            /**
+             * On file change tell us.
+             * @param fileChangeEvent The file change.
+             */
+            void fileChanged(FileChangeEvent fileChangeEvent) {
+                if (fileChangeEvent.file.type == FileType.FILE)
+                    if (fileChangeEvent.file.getName().extension == "groovy")
+                        scriptedEventManager.reloadCache();
+            }
+        };
+        fileMonitor = new DefaultFileMonitor(fileMonitorFunction);
+        fileMonitor.setRecursive(true);
+        fileMonitor.start();
     }
 
     /**
@@ -404,5 +456,28 @@ class EventManagerHandler {
      */
     Boolean containsEvent(FileObject fileObject) {
         return scriptedEventManager.containsEventFile(fileObject);
+    }
+
+    /**
+     * Clear all files being monitored.
+     */
+    void clearDirectoryMonitoring() {
+        fileMonitor.stop();
+        fileMonitor = new DefaultFileMonitor(fileMonitorFunction);
+        fileMonitor.setRecursive(true);
+        fileMonitor.start();
+        Logger.getLogger(EventManagerHandler.getClass().getCanonicalName()).info("Cleared directory monitoring");
+    }
+
+    void addDirectoryMonitoring(FileObject fileObject) {
+        if (fileObject.type == FileType.FOLDER) {
+            fileMonitor.addFile(fileObject);
+            Logger.getLogger(EventManagerHandler.getClass().getCanonicalName()).info("Adding new directory to monitoring ${fileObject}");
+        }
+    }
+
+    void removeDirectoryMonitoring(FileObject fileObject) {
+        fileMonitor.removeFile(fileObject);
+        Logger.getLogger(EventManagerHandler.getClass().getCanonicalName()).info("Removed directory from monitoring ${fileObject}");
     }
 }
