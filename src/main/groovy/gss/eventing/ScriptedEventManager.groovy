@@ -144,6 +144,10 @@ class ScriptedEventManager {
         return ret;
     }
 
+    Event getEvent(FileObject fileObject) {
+        return eventsObjects.get(fileObject);
+    }
+
     /**
      * Add an event to the manager.
      * @param key The trigger key to use.
