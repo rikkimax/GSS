@@ -125,7 +125,7 @@ class EventManager {
     }
 
     /**
-     * Removes and event from a trigger.
+     * Removes an event from a trigger.
      * @param key The key to use as trigger.
      * @param event The event to remove.
      */
@@ -133,7 +133,7 @@ class EventManager {
         removeEvent(key.getCanonicalName(), event);
     }
     /**
-     * Removes and event from a trigger.
+     * Removes an event from a trigger.
      * @param key The key to use as trigger.
      * @param event The event to remove.
      */
@@ -141,7 +141,7 @@ class EventManager {
         removeEvent(key.getClass(), event);
     }
     /**
-     * Removes and event from a trigger.
+     * Removes an event from a trigger.
      * @param key The key to use as trigger.
      * @param event The event to remove.
      */
