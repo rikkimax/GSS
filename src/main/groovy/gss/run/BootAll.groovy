@@ -148,17 +148,17 @@ class BootAll {
             String extension = "";
             if (countUsed.get(type) > 0)
                 extension = "_" + countUsed.get(type) + "";
-            File tempConfigUniqueDirs = new File(configDir.getAbsolutePath().replace("\\", "/") + type + extension + "/");
-            File tempWorkingUniqueDirs = new File(workingDir.getAbsolutePath().replace("\\", "/") + type + extension + "/");
+            File tempWorkingUniqueDirs = new File(workingDir.getAbsolutePath().replace("\\", "/") + "/" + type + extension + "/");
+            File tempConfigUniqueDirs = new File(tempWorkingUniqueDirs.getAbsolutePath().replace("\\", "/") + "/config/");
             switch (type) {
                 case "login":
                     Logger.getLogger("gss.BootAll").info("Creating login type node");
                     countUsed.put(type, countUsed.get(type) + 1);
                     Thread.start {
                         if (uniqueDirs)
-                            LoginNode.main("--configDir=${tempConfigUniqueDirs} --workingDir=${tempWorkingUniqueDirs}");
+                            LoginNode.main("--configDir=${tempConfigUniqueDirs}", "--workingDir=${tempWorkingUniqueDirs}");
                         else
-                            LoginNode.main("--configDir=${configDir} --workingDir=${workingDir}");
+                            LoginNode.main("--configDir=${configDir}", "--workingDir=${workingDir}");
                     }
                     break;
                 default:

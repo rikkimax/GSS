@@ -288,20 +288,26 @@ class ScriptedEventManager {
         gcl.clearCache();
         eventsFiles.each {key, eventsList ->
             eventsList.each {eventFile ->
-                Object returned = gcl.parseClass(eventFile.content.inputStream);
                 boolean failed = true;
-                if (returned != null)
-                    if (returned instanceof Class) {
-                        Object returnedObject = returned.newInstance();
-                        if (returnedObject instanceof Event) {
-                            eventsObjects.put(eventFile, returnedObject);
-                            returnedObject.create(key, booter);
-                            failed = false;
-                            Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Loaded " + returnedObject.getClass().getName() + " into cache");
+                if (eventFile.exists()) {
+                    Object returned = gcl.parseClass(eventFile.content.inputStream);
+                    if (returned != null)
+                        if (returned instanceof Class) {
+                            Object returnedObject = returned.newInstance();
+                            if (returnedObject instanceof Event) {
+                                eventsObjects.put(eventFile, returnedObject);
+                                returnedObject.create(key, booter);
+                                failed = false;
+                                Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Loaded " + returnedObject.getClass().getName() + " into cache");
+                            }
                         }
-                    }
-                if (failed)
-                    Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Failed to load " + eventFile + " into cache");
+                }
+                if (failed) {
+                    Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Failed to load " + eventFile + " into cache removing");
+                    if (eventsObjects.get(eventFile) != null)
+                        eventsObjects.get(eventFile).destroy("");
+                    eventsObjects.remove(eventFile);
+                }
             }
         }
         checkObsoleteCache();
@@ -334,21 +340,26 @@ class ScriptedEventManager {
     private void loadClassCache(FileObject fileObject) {
         eventsFiles.each {key, eventsList ->
             eventsList.each {eventFile ->
-                if (eventFile.getURL() == fileObject.getURL()) {
-                    Object returned = gcl.parseClass(eventFile.content.inputStream);
-                    boolean failed = true;
-                    if (returned != null)
-                        if (returned instanceof Class) {
-                            Object returnedObject = returned.newInstance();
-                            if (returnedObject instanceof Event) {
-                                eventsObjects.put(eventFile, returnedObject);
-                                returnedObject.create(key, booter);
-                                failed = false;
-                                Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Loaded " + returnedObject.getClass().getName() + " into cache");
+                boolean failed = true;
+                if (eventFile.exists())
+                    if (eventFile.getURL() == fileObject.getURL()) {
+                        Object returned = gcl.parseClass(eventFile.content.inputStream);
+                        if (returned != null)
+                            if (returned instanceof Class) {
+                                Object returnedObject = returned.newInstance();
+                                if (returnedObject instanceof Event) {
+                                    eventsObjects.put(eventFile, returnedObject);
+                                    returnedObject.create(key, booter);
+                                    failed = false;
+                                    Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Loaded " + returnedObject.getClass().getName() + " into cache");
+                                }
                             }
-                        }
-                    if (failed)
-                        Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Failed to load " + fileObject + " into cache");
+                    }
+                if (failed) {
+                    Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Failed to load " + eventFile + " into cache removing");
+                    if (eventsObjects.get(eventFile) != null)
+                        eventsObjects.get(eventFile).destroy("");
+                    eventsObjects.remove(eventFile);
                 }
             }
         }
@@ -452,4 +463,5 @@ class ScriptedEventManager {
         }
         return false;
     }
+
 }

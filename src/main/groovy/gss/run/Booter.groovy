@@ -42,6 +42,7 @@ import gss.eventing.Event
 import gss.eventing.UnknownEvent
 import org.apache.commons.vfs.VFS
 import gss.eventing.EventManagerHandler
+import org.apache.commons.vfs.FileType
 
 /**
  * The point of this class is to provide a generic booter to be extended.
@@ -115,6 +116,7 @@ abstract class Booter {
     void parseArguments(OptionParser optionParser, OptionSet optionSet) {
         File configDir = ((File) optionSet.valueOf("configDir"));
         workingDir = optionSet.valueOf("workingDir");
+        workingDir.mkdirs();
         configDir.mkdirs();
         if (configDir.exists()) {
             config.setDirectory(configDir);
@@ -171,7 +173,7 @@ abstract class Booter {
      */
     void startUpEventManager() {
         eventManager = new EventManagerHandler(this);
-        FileObject eventsFO = config.getDirectory().resolveFile(getType())?.resolveFile("events.yml");
+        FileObject eventsFO = config.getDirectory()?.resolveFile("events.yml");
         if (eventsFO?.exists()) {
             //Our type has a configuration directory and events file
             Yaml yaml = new Yaml();
@@ -204,7 +206,10 @@ abstract class Booter {
             if (toTrigger)
                 eventManager.addEvent(it, new UnknownEvent());
         }
-        eventManager.addDirectoryMonitoring(workingDirFileObject());
+        FileObject eventsDir = workingDirFileObject.resolveFile("events");
+        if (!eventsDir.exists())
+            eventsDir.createFolder();
+        eventManager.addDirectoryMonitoring(eventsDir);
     }
 
     /**

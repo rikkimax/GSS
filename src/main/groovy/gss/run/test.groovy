@@ -34,10 +34,12 @@ import org.apache.commons.vfs.FileObject
 /**
  * For when tests just need an output and can be deleted afterwards...
  */
-File location = new File("C:\\cygwin\\home\\rikki\\GSS_TEST");
+/*File location = new File("C:\\cygwin\\home\\rikki\\GSS_TEST");
 FileObject currentDir = VFS.getManager().resolveFile(location.getAbsolutePath());
 FileObject testEvent = currentDir.resolveFile("TestEvent.groovy");
 
 ScriptedEventManager scriptedEventManager = new ScriptedEventManager(null);
 scriptedEventManager.addEvent("TestEvent", testEvent);
-scriptedEventManager.trigger("TestEvent", null, "For the lulz");
+scriptedEventManager.trigger("TestEvent", null, "For the lulz");*/
+
+BootAll.main("--kg", "--uniqueDirs=true", "Login");
