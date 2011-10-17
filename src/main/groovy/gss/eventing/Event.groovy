@@ -47,7 +47,20 @@ abstract class Event {
      * @param context Who triggered this trigger.
      * @param passed Any passed data provided by the trigger.
      */
-    abstract void run(String trigger, Object context, Object[] passed);
+    abstract void run(String trigger, Object context, Object... passed);
+
+    /**
+     * Run of an event code that returns data.
+     * By default this method doesn't need to be overriden but it is here if needed.
+     * @param trigger The trigger key that was used.
+     * @param context Who triggered this trigger.
+     * @param defaultValue The default value to return or work with.
+     * @param passed Any passed data provided by the trigger.
+     * @return
+     */
+    Object run(String trigger, Object context, Object defaultValue, Object... passed) {
+         return defaultValue;
+    }
 
     /**
      * During creation or assimulation with a key to this event this gets called.

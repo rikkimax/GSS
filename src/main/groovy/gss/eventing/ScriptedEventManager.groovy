@@ -369,15 +369,17 @@ class ScriptedEventManager {
      * Triggers a list of events.
      * @param key The key to use as trigger.
      * @param context Who called this trigger.
+     * @param defaultValue The default value to use and return from events.
      * @param pass Anything required to pass to the events.
      */
-    synchronized void trigger(String key, Object context, Object... pass) {
+    synchronized Object trigger(String key, Object context, Object defaultValue, Object... pass) {
         List<Event> events = getEvents(key);
         events.each {event ->
-            event.run(key, context, pass);
+            defaultValue = event.run(key, context, defaultValue, pass);
         }
         if (events.size() <= 0 && events.contains(UnknownEvent.class))
-            trigger(UnknownEvent.class, context, pass);
+            trigger(UnknownEvent.class, context, defaultValue, pass);
+        return defaultValue;
     }
 
     /**
@@ -386,7 +388,7 @@ class ScriptedEventManager {
      * @param pass Anything required to pass to the events.
      */
     void trigger(Class key, Object context, Object... pass) {
-        trigger(key.getCanonicalName(), context, pass);
+        trigger(key.getCanonicalName(), context, null, pass);
     }
 
     /**
@@ -396,6 +398,36 @@ class ScriptedEventManager {
      */
     void trigger(Object key, Object context, Object... pass) {
         trigger(key.getClass(), context, pass);
+    }
+
+    /**
+     * Triggers a list of events.
+     * @param key The key to use as trigger.
+     * @param context Who called this trigger.
+     * @param pass Anything required to pass to the events.
+     */
+    void trigger(String key, Object context, Object... pass) {
+        trigger(key, context, null, pass);
+    }
+
+    /**
+     * Triggers a list of events.
+     * @param key The key to use as trigger.
+     * @param defaultValue The default value to use and return from events.
+     * @param pass Anything required to pass to the events.
+     */
+    Object trigger(Class key, Object context, Object defaultValue, Object... pass) {
+        return trigger(key.getCanonicalName(), context, defaultValue, pass);
+    }
+
+    /**
+     * Triggers a list of events.
+     * @param key The key to use as trigger.
+     * @param defaultValue The default value to use and return from events.
+     * @param pass Anything required to pass to the events.
+     */
+    Object trigger(Object key, Object context, Object defaultValue, Object... pass) {
+        return trigger(key.getClass(), context, defaultValue, pass);
     }
 
     /**
@@ -463,5 +495,4 @@ class ScriptedEventManager {
         }
         return false;
     }
-
 }
