@@ -189,24 +189,27 @@ class EventManager {
     /**
      * Triggers a list of events.
      * @param key The key to use as trigger.
+     * @param context Who called this trigger.
      * @param pass Anything required to pass to the events.
      */
     void trigger(Class key, Object context, Object... pass) {
-        trigger(key.getCanonicalName(), context, pass);
+        trigger(key.getCanonicalName(), context, null, pass);
     }
 
     /**
      * Triggers a list of events.
      * @param key The key to use as trigger.
+     * @param context Who called this trigger.
      * @param pass Anything required to pass to the events.
      */
     void trigger(Object key, Object context, Object... pass) {
-        trigger(key.getClass(), context, null, pass);
+        trigger(key.getClass(), context, pass);
     }
 
     /**
      * Triggers a list of events.
      * @param key The key to use as trigger.
+     * @param context Who called this trigger.
      * @param defaultValue The default value to use and return from events.
      * @param pass Anything required to pass to the events.
      */
@@ -217,6 +220,7 @@ class EventManager {
     /**
      * Triggers a list of events.
      * @param key The key to use as trigger.
+     * @param context Who called this trigger.
      * @param defaultValue The default value to use and return from events.
      * @param pass Anything required to pass to the events.
      */
