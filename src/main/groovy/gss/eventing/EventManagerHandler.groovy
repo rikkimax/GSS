@@ -386,9 +386,9 @@ class EventManagerHandler {
      * @param defaultValue The default value to use and return from events.
      * @param pass Anything required to pass to the events.
      */
-    synchronized Object trigger(String key, Object context, Object defaultValue, Object... pass) {
-        defaultValue = scriptedEventManager.trigger(key, context, defaultValue, pass);
-        defaultValue = eventManager.trigger(key, context, defaultValue, pass);
+    synchronized Object triggerReturn(String key, Object context, Object defaultValue, Object... pass) {
+        defaultValue = scriptedEventManager.triggerReturn(key, context, defaultValue, pass);
+        defaultValue = eventManager.triggerReturn(key, context, defaultValue, pass);
         return defaultValue;
     }
 
@@ -417,7 +417,8 @@ class EventManagerHandler {
      * @param pass Anything required to pass to the events.
      */
     void trigger(String key, Object context, Object... pass) {
-        trigger(key, context, null, pass);
+        scriptedEventManager.trigger(key, context, pass);
+        eventManager.trigger(key, context, pass);
     }
 
     /**
@@ -427,8 +428,8 @@ class EventManagerHandler {
      * @param defaultValue The default value to use and return from events.
      * @param pass Anything required to pass to the events.
      */
-    Object trigger(Class key, Object context, Object defaultValue, Object... pass) {
-        return trigger(key.getCanonicalName(), context, defaultValue, pass);
+    Object triggerReturn(Class key, Object context, Object defaultValue, Object... pass) {
+        return triggerReturn(key.getCanonicalName(), context, defaultValue, pass);
     }
 
     /**
@@ -438,8 +439,8 @@ class EventManagerHandler {
      * @param defaultValue The default value to use and return from events.
      * @param pass Anything required to pass to the events.
      */
-    Object trigger(Object key, Object context, Object defaultValue, Object... pass) {
-        return trigger(key.getClass(), context, defaultValue, pass);
+    Object triggerReturn(Object key, Object context, Object defaultValue, Object... pass) {
+        return triggerReturn(key.getClass(), context, defaultValue, pass);
     }
 
     /**

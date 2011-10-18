@@ -44,9 +44,27 @@ class UnknownEvent extends Event {
      */
     @Override
     void run(String trigger, Object context, Object[] passed) {
-        Logger.getLogger(UnknownEvent.class.getName()).warning("Unknown event triggered...");
-        Logger.getLogger(UnknownEvent.class.getName()).warning("Trigger: [${trigger}] Context: [${context}]");
-        Logger.getLogger(UnknownEvent.class.getName()).warning("Passed values: [${passed}]");
+        Logger.getLogger(UnknownEvent.class.getName()).info("Unknown event triggered...");
+        Logger.getLogger(UnknownEvent.class.getName()).info("Trigger: [${trigger}] Context: [${context}]");
+        Logger.getLogger(UnknownEvent.class.getName()).info("Passed values: [${passed}]");
+    }
+
+    /**
+     * Run of an event code that returns data.
+     * By default this method doesn't need to be overriden but it is here if needed.
+     * @param trigger The trigger key that was used.
+     * @param context Who triggered this trigger.
+     * @param defaultValue The default value to return or work with.
+     * @param passed Any passed data provided by the trigger.
+     * @return
+     */
+    @Override
+    Object run(String trigger, Object context, Object defaultValue, Object... passed) {
+        Logger.getLogger(UnknownEvent.class.getName()).info("Unknown event triggered...");
+        Logger.getLogger(UnknownEvent.class.getName()).info("Trigger: [${trigger}] Context: [${context}]");
+        Logger.getLogger(UnknownEvent.class.getName()).info("Default value: [${defaultValue}]");
+        Logger.getLogger(UnknownEvent.class.getName()).info("Passed values: [${passed}]");
+        return defaultValue;
     }
 
     /**
@@ -56,6 +74,7 @@ class UnknownEvent extends Event {
      */
     @Override
     void create(String key, Booter booter) {
+        super.create(key, booter);
     }
 
     /**

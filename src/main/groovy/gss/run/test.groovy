@@ -30,16 +30,21 @@ package gss.run
 import gss.eventing.ScriptedEventManager
 import org.apache.commons.vfs.VFS
 import org.apache.commons.vfs.FileObject
+import gss.eventing.EventManagerHandler
+import gss.eventing.UnknownEvent
+import java.util.logging.Logger
+import java.util.logging.Level
 
 /**
  * For when tests just need an output and can be deleted afterwards...
  */
-/*File location = new File("C:\\cygwin\\home\\rikki\\GSS_TEST");
+Logger.getLogger(UnknownEvent.class.getName()).setLevel(Level.ALL);
+File location = new File("C:\\cygwin\\home\\rikki\\GSS_TEST");
 FileObject currentDir = VFS.getManager().resolveFile(location.getAbsolutePath());
-FileObject testEvent = currentDir.resolveFile("TestEvent.groovy");
 
-ScriptedEventManager scriptedEventManager = new ScriptedEventManager(null);
-scriptedEventManager.addEvent("TestEvent", testEvent);
-scriptedEventManager.trigger("TestEvent", null, "For the lulz");*/
+EventManagerHandler eventManagerHandler = new EventManagerHandler();
+eventManagerHandler.addDirectoryMonitoring(currentDir);
+eventManagerHandler.addEvent(UnknownEvent.class, currentDir.resolveFile("TestEvent.groovy"));
+eventManagerHandler.trigger(UnknownEvent.class, null, "hmm");
 
-BootAll.main("--kg", "--uniqueDirs=true", "Login");
+//BootAll.main("--kg", "--uniqueDirs=true", "Login");

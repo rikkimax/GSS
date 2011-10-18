@@ -35,6 +35,11 @@ import gss.run.Booter
 abstract class Event {
 
     /**
+     * The booter that started this application.
+     */
+    protected Booter booter;
+
+    /**
      *
      */
     Event() {
@@ -47,7 +52,9 @@ abstract class Event {
      * @param context Who triggered this trigger.
      * @param passed Any passed data provided by the trigger.
      */
-    abstract void run(String trigger, Object context, Object... passed);
+    abstract void run(String trigger, Object context, Object... passed)
+
+    ;
 
     /**
      * Run of an event code that returns data.
@@ -59,7 +66,7 @@ abstract class Event {
      * @return
      */
     Object run(String trigger, Object context, Object defaultValue, Object... passed) {
-         return defaultValue;
+        return defaultValue;
     }
 
     /**
@@ -67,11 +74,39 @@ abstract class Event {
      * @param key The key being assimulated to.
      * @param booter The booter that started this application.
      */
-    abstract void create(String key, Booter booter);
+    void create(String key, Booter booter) {
+        this.booter = booter;
+    }
 
     /**
      * During destruction or deasimulation of an even to a key this method gets called.
      * @param key The key being deasimulated to.
      */
-    abstract void destroy(String key);
+    abstract void destroy(String key)
+
+    ;
+
+    /**
+     * Assimilate this event to a trigger.
+     * @param key The trigger key.
+     */
+    void assimilate(String key) {
+        booter.eventManager.addEvent(key, this);
+    }
+
+    /**
+     * Assimilate this event to a trigger.
+     * @param key The trigger key.
+     */
+    void assimilate(Object key) {
+        assimilate(key.getClass());
+    }
+
+    /**
+     * Assimilate this event to a trigger.
+     * @param key The trigger key.
+     */
+    void assimilate(Class key) {
+        assimilate(key.getCanonicalName());
+    }
 }
