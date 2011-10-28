@@ -42,11 +42,13 @@ class TestQueue {
      */
     @Id
     @GeneratedValue
-    protected Long created;
+    private Long created;
+
     /**
      * Has this item been read yet?
      */
-    protected Boolean read = false;
+    private Boolean read = false;
+
     /**
      * The string to store.
      */
@@ -56,7 +58,7 @@ class TestQueue {
      * Initiation method, sets created time.
      */
     TestQueue() {
-       created = System.currentTimeMillis();
+        created = System.currentTimeMillis();
     }
 
     /**
