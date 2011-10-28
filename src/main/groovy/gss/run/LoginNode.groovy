@@ -76,13 +76,6 @@ class LoginNode extends Booter {
         super.startup();
         if (keepGoingStartUp)
             startUpServers();
-        Session session = getSession();
-        session.beginTransaction();
-        TestQueue testQueue = new TestQueue();
-        testQueue.setTest("test");
-        session.save(testQueue);
-        session.close();
-
     }
 
     /**
