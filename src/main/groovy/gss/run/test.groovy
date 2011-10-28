@@ -34,17 +34,27 @@ import gss.eventing.EventManagerHandler
 import gss.eventing.UnknownEvent
 import java.util.logging.Logger
 import java.util.logging.Level
+import org.hibernate.SessionFactory
+import org.hibernate.annotations.common.annotationfactory.AnnotationFactory
+import org.hibernate.cfg.AnnotationConfiguration
+import gss.queueing.TestQueue
 
 /**
  * For when tests just need an output and can be deleted afterwards...
  */
-Logger.getLogger(UnknownEvent.class.getName()).setLevel(Level.ALL);
+/*Logger.getLogger(UnknownEvent.class.getName()).setLevel(Level.ALL);
 File location = new File("C:\\cygwin\\home\\rikki\\GSS_TEST");
 FileObject currentDir = VFS.getManager().resolveFile(location.getAbsolutePath());
 
 EventManagerHandler eventManagerHandler = new EventManagerHandler();
 eventManagerHandler.addDirectoryMonitoring(currentDir);
-eventManagerHandler.addEvent(UnknownEvent.class, currentDir.resolveFile("TestEvent.groovy"));
-eventManagerHandler.trigger(UnknownEvent.class, null, "hmm");
+eventManagerHandler.addEvent(UnknownEvent.class, currentDir.resolveFile("gss.eventing.TestEvent.groovy"));
+eventManagerHandler.trigger(UnknownEvent.class, null, "hmm");*/
 
-//BootAll.main("--kg", "--uniqueDirs=true", "Login");
+class test {
+    public static void main(String[] args) {
+        LoginNode loginNode = new LoginNode();
+        loginNode.boot();
+        //BootAll.main("--kg", "--uniqueDirs=true", "Login");
+    }
+}

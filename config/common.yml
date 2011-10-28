@@ -1,2 +1,3 @@
 SerializedClasses:
     - gss.eventing.UnknownEvent
+    - gss.queueing.TestQueue

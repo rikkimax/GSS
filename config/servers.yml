@@ -5,7 +5,7 @@
         pass: # we ignore this...
         other:
             servers:
-                gss.login.socket.connectors.KryoNetServer:
+                 gss.login.socket.connectors.KryoNetServer:
                         -
                             port: 100
                 # gss.run.servers.connectors.Plain:
@@ -27,12 +27,8 @@
             hibernate.connection.username: "SA"
             hibernate.connection.password: ""
             hibernate.dialect: org.hibernate.dialect.HSQLDialect
-            hibernate.current_session_context_class: thread
-            hibernate.transaction.factory_class: org.hibernate.transaction.JDBCTransactionFactory
-            hibernate.cache.provider_class: org.hibernate.cache.NoCacheProvider
-            hibernate.connection.pool_size: 1
             hibernate.connection.autocommit: true
-            hibernate.hbm2ddl.auto: create-drop
+            hibernate.hbm2ddl.auto: create
             hibernate.show_sql: true
 
     -   # Content server (e.g. apache2)

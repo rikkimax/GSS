@@ -38,6 +38,8 @@ import org.hibernate.SessionFactory
 import org.hibernate.Session
 import gss.login.socket.ServerSocket
 import gss.login.Servers
+import gss.queueing.TestQueue
+import gss.queueing.QueueManager
 
 /**
  * This is a booter class, it will start every thing up for the login node.
@@ -74,6 +76,13 @@ class LoginNode extends Booter {
         super.startup();
         if (keepGoingStartUp)
             startUpServers();
+        Session session = getSession();
+        session.beginTransaction();
+        TestQueue testQueue = new TestQueue();
+        testQueue.setTest("test");
+        session.save(testQueue);
+        session.close();
+
     }
 
     /**
@@ -90,7 +99,7 @@ class LoginNode extends Booter {
             }
         }
         HashMap<ArrayList<HashMap<Object, Object>>> serversConfig = current.other?.get("servers");
-        for (String serverClass: serversConfig.keySet()) {
+        for (String serverClass: serversConfig?.keySet()) {
             ArrayList<HashMap<Object, Object>> values = serversConfig.get(serverClass);
             Class serverClassReflected = Eval.me("return " + serverClass + ".class");
             if (serverClassReflected != null) {

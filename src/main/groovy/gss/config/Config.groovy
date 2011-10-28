@@ -115,9 +115,11 @@ class Config {
         annotationConfiguration = new AnnotationConfiguration();
         serializedClasses.each {
             Class clasz = Eval.me("return ${it}.class;");
-            kryo.register(clasz);
-            Logger.getLogger(this.getClass().getName()).info("Adding class " + clasz + " to annotated list");
-            annotationConfiguration.addAnnotatedClass(clasz);
+            if (clasz != null) {
+                kryo.register(clasz);
+                Logger.getLogger(this.getClass().getName()).info("Adding class " + clasz + " to annotated list");
+                annotationConfiguration.addAnnotatedClass(clasz);
+            }
         }
     }
 
@@ -125,7 +127,7 @@ class Config {
      * Gets the AnnotationConfiguration to be used with Hibernate.
      * @return The AnnotationConfiguration to be used.
      */
-    final AnnotationConfiguration getAnnotationConfiguration() {
+    AnnotationConfiguration getAnnotationConfiguration() {
         return annotationConfiguration;
     }
 
@@ -133,7 +135,7 @@ class Config {
      * Gets the Kryo instance to be used with KryoNet.
      * @return The Kryo instance to be used.
      */
-    final Kryo getKryo() {
+    Kryo getKryo() {
         return kryo;
     }
 

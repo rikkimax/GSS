@@ -43,6 +43,8 @@ import gss.eventing.UnknownEvent
 import org.apache.commons.vfs.VFS
 import gss.eventing.EventManagerHandler
 import org.apache.commons.vfs.FileType
+import gss.queueing.TestQueue
+import org.hibernate.cfg.AnnotationConfiguration
 
 /**
  * The point of this class is to provide a generic booter to be extended.
@@ -153,19 +155,17 @@ abstract class Booter {
         }
         //set database server from config
         database.getOther().keySet().each {
-            if (it.startsWith("hibernate"))
-                configH.put(it, database.getOther().get(it).toString().replace("{configDir}", config.getDirectory().getURL().toString()));
+            configH.put(it, database.getOther().get(it).toString().replace("{configDir}", config.getDirectory().getURL().toString()));
         }
-        if (configH.get("hibernate.connection.url") == null)
-            keepGoingStartUp = false;
-        else {
+        if (configH.get("hibernate.connection.url") != null) {
             //database url exists, otherwise we can't work...
-            Logger.getLogger(Booter.class.getName()).info("Using database connection: " + configH.get("openjpa.ConnectionURL"));
+            Logger.getLogger(Booter.class.getName()).info("Using database connection: " + configH.get("hibernate.connection.url"));
             configH.keySet().each {
                 config.getAnnotationConfiguration().setProperty(it, configH.get(it));
             }
             sessionFactory = config.getAnnotationConfiguration().buildSessionFactory();
-        }
+        } else
+            keepGoingStartUp = false;
     }
 
     /**
