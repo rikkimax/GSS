@@ -58,13 +58,15 @@ class QueueManager<T> {
         Session session = booter.getSession();
         session.beginTransaction();
         Criteria criteria = session.createCriteria(T);
-        criteria.add(Restrictions.eq("read", false));
+        if (T.getDeclaredField("read") != null)
+            criteria.add(Restrictions.eq("read", false));
         criteria.addOrder(Order.desc("created"));
         criteria.setMaxResults(1);
         List ret = criteria.list();
         session.close();
         if (ret.size() > 0) {
-            mark((T) ret.get(0));
+            if (T.getDeclaredField("read") != null)
+                mark((T) ret.get(0));
             return (T) ret.get(0);
         }
         return null;
@@ -105,7 +107,8 @@ class QueueManager<T> {
      * @param object The item to mark.
      */
     void mark(T object) {
-        Eval.x(object, "x.setRead(true);");
+        if (T.getDeclaredField("read") != null)
+            Eval.x(object, "x.setRead(true);");
         save(object);
     }
 
@@ -114,7 +117,8 @@ class QueueManager<T> {
      * @param object An item to unmark.
      */
     void unmark(T object) {
-        Eval.x(object, "x.setRead(false);");
+        if (T.getDeclaredField("read") != null)
+            Eval.x(object, "x.setRead(false);");
         save(object);
     }
 }
