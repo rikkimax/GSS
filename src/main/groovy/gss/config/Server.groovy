@@ -38,18 +38,7 @@ class Server {
      *  The type of server it is.
      */
     public String type;
-    /**
-     * The host (IP/hostname) of the server.
-     */
-    public String host;
-    /**
-     * The port we used to connect to the server.
-     */
-    public int port;
-    /**
-     * The password to use if required.
-     */
-    public String pass;
+
     /**
      * Any other settings can be stored here.
      */
@@ -78,54 +67,6 @@ class Server {
         this.type = serverType;
     }
 
-    /**
-     * Gets the hostname / IP of server.
-     * @return The hostname / IP of server.
-     */
-    String getHost() {
-        return host;
-    }
-
-    /**
-     * Sets the hostname / IP of server.
-     * (For BeanUtils)
-     * @param host The hostname / IP of server to set to.
-     */
-    void setHost(String host) {
-        this.host = host;
-    }
-
-    /**
-     * Gets the port of server.
-     * @return The port of the server.
-     */
-    int getPort() {
-        return port;
-    }
-
-    /**
-     * Sets the port of the server.
-     * (For BeanUtils)
-     * @param port The port to set to.
-     */
-    void setPort(int port) {
-        this.port = port;
-    }
-    /**
-     * Gets the password of the server.
-     * @return The password of the server.
-     */
-    String getPass() {
-        return pass;
-    }
-    /**
-     * Sets the password of the server.
-     * (For BeanUtils)
-     * @param pass The password of the server to use.
-     */
-    void setPass(String pass) {
-        this.pass = pass;
-    }
     /**
      * Overides toString so we can get some real information when we output this class or convert to string.
      * @return The description of this server.

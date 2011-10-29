@@ -43,6 +43,11 @@ class QueueManager<T> {
     private Booter booter;
 
     /**
+     * The class we are working with.
+     */
+    private final Class clasz = T;
+
+    /**
      * Initiation method.
      * @param booter The booter that created this instance.
      */
@@ -108,5 +113,13 @@ class QueueManager<T> {
     void unmark(T object) {
         Eval.x(object, "x.setRead(false);");
         save(object);
+    }
+
+    /**
+     * The class we are using.
+     * @return Class we are using.
+     */
+    T getClass() {
+        return T;
     }
 }

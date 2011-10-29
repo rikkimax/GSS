@@ -268,4 +268,12 @@ abstract class Booter {
     FileObject getWorkingDirFileObject() {
         return VFS.getManager().resolveFile(workingDir.getAbsolutePath());
     }
+
+    /**
+     * Do keep the server going?
+     * @return Keep the server going value.
+     */
+    Boolean getKeepGoing() {
+        return keepGoingStartUp;
+    }
 }

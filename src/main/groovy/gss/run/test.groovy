@@ -53,8 +53,8 @@ eventManagerHandler.trigger(UnknownEvent.class, null, "hmm");*/
 
 class test {
     public static void main(String[] args) {
-        LoginNode loginNode = new LoginNode();
-        loginNode.boot();
-        //BootAll.main("--kg", "--uniqueDirs=true", "Login");
+        //LoginNode loginNode = new LoginNode();
+        //loginNode.boot();
+        BootAll.main("--kg", "--uniqueDirs=true", "Login");
     }
 }

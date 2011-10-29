@@ -57,7 +57,7 @@ class BootAll {
             println("");
             println("A list of nodes to load");
             println("------------------------");
-            println("\tValid types: Login");
+            println("\tValid types: Login, Processing");
             keepGoingStartUp = false;
         } else if (optionSet.hasOptions() || optionSet.nonOptionArguments().size() > 0) {
             parseArguments(optionParser, optionSet);
@@ -156,9 +156,19 @@ class BootAll {
                     countUsed.put(type, countUsed.get(type) + 1);
                     Thread.start {
                         if (uniqueDirs)
-                            LoginNode.main("--configDir=${tempConfigUniqueDirs}", "--workingDir=${tempWorkingUniqueDirs}");
+                            (new LoginNode()).boot("--configDir=${tempConfigUniqueDirs}", "--workingDir=${tempWorkingUniqueDirs}");
                         else
                             LoginNode.main("--configDir=${configDir}", "--workingDir=${workingDir}");
+                    }
+                    break;
+                case "processing":
+                    Logger.getLogger("gss.BootAll").info("Creating processing type node");
+                    countUsed.put(type, countUsed.get(type) + 1);
+                    Thread.start {
+                        if (uniqueDirs)
+                            (new ProcessingNode()).boot("--configDir=${tempConfigUniqueDirs}", "--workingDir=${tempWorkingUniqueDirs}");
+                        else
+                            ProcessingNode.main("--configDir=${configDir}", "--workingDir=${workingDir}");
                     }
                     break;
                 default:
