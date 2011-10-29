@@ -1,0 +1,32 @@
+    -   # This server
+        type: current
+        other:
+            servers:
+                 gss.login.socket.connectors.KryoNetServer:
+                        -
+                            port: 100
+                # gss.run.servers.connectors.Plain:
+
+    -   # Login server (custom made)
+        type: login
+
+    -   # Database server (e.g. mysql)
+        type: database
+        other:
+            hibernate.connection.driver_class: org.hsqldb.jdbcDriver
+            hibernate.connection.url: jdbc:hsqldb:{workingDir}/database/database.db
+            hibernate.connection.username: "SA"
+            hibernate.connection.password: ""
+            hibernate.dialect: org.hibernate.dialect.HSQLDialect
+            hibernate.connection.autocommit: true
+            hibernate.hbm2ddl.auto: create
+            hibernate.show_sql: true
+
+    -   # Content server (e.g. apache2)
+        type: content
+        other:
+            directory: {gameVersion}
+            # I'm just guessing.. for a multi game storage content server with different versions
+
+    -   # Processing server (custom made)
+        type: processing

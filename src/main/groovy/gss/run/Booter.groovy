@@ -155,7 +155,7 @@ abstract class Booter {
         }
         //set database server from config
         database.getOther().keySet().each {
-            configH.put(it, database.getOther().get(it).toString().replace("{configDir}", config.getDirectory().getURL().toString()));
+            configH.put(it, database.getOther().get(it).toString().replace("{configDir}", config.getDirectory().getURL().toString()).replace("{workingDir}", workingDir.getAbsolutePath()));
         }
         if (configH.get("hibernate.connection.url") != null) {
             //database url exists, otherwise we can't work...
