@@ -508,6 +508,16 @@ class EventManagerHandler {
     void addDirectoryMonitoring(FileObject fileObject) {
         if (fileObject.type == FileType.FOLDER) {
             fileMonitor.addFile(fileObject);
+            fileObject.children.each {
+                if (it.getType() == FileType.FOLDER)
+                    addDirectoryMonitoring(it);
+                else {
+                    if (it.type == FileType.FILE)
+                        if (it.getName().extension == "groovy")
+                            addEvent(UnknownEvent.class, it);
+                }
+
+            }
             Logger.getLogger(EventManagerHandler.getClass().getCanonicalName()).info("Adding new directory to monitoring ${fileObject}");
         }
     }

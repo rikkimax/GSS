@@ -119,7 +119,7 @@ class QueueManager<T> {
      * The class we are using.
      * @return Class we are using.
      */
-    T getClass() {
+    Class<T> getClassUsed() {
         return T;
     }
 }
