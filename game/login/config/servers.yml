@@ -5,7 +5,11 @@
                  gss.login.socket.connectors.KryoNetServer:
                         -
                             port: 100
-                # gss.run.servers.connectors.Plain:
+                gss.run.servers.connectors.PlainServer:
+                        -
+                            port: 100
+                            # A required handler that extends this...
+                            # handler: gss.run.servers.connectors.PlainClientHandler
 
     -   # Login server (custom made)
         type: login

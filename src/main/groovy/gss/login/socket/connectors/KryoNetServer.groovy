@@ -68,8 +68,8 @@ class KryoNetServer extends ServerSocket {
      */
     synchronized SocketClient[] getClients() {
         ArrayList<KryoNetClient> clients = new ArrayList<KryoNetClient>();
-        for (Connection connection: server.connections) {
-            clients.add(new KryoNetClient(this, connection, simpleID));
+        server.connections.each {
+            clients.add(new KryoNetClient(this, it, simpleID));
         }
         return clients.toArray();
     }

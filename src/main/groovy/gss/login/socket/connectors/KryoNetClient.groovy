@@ -39,7 +39,7 @@ class KryoNetClient extends SocketClient {
     /**
      * Do we make the ID of the client simple?
      */
-    private int simpleID = false;
+    private Boolean simpleID = false;
 
     /**
      * The connection used and gained by KryoNet.
