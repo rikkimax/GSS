@@ -31,6 +31,7 @@ import gss.run.Booter
 import org.apache.commons.vfs.FileObject
 import java.util.concurrent.ConcurrentHashMap
 import org.apache.commons.vfs.FileType
+import org.apache.commons.vfs.provider.local.LocalFile
 
 /**
  * The point of this class is to allow scripted classes to load at boot time.
@@ -89,6 +90,7 @@ class ScriptedBootLoader {
      * @param fo
      */
     protected void load(FileObject fo) {
+        directory.createFolder();
         fo.children.each {
             if (it.getType() == FileType.FOLDER)
                 load(it);

@@ -37,6 +37,7 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory
 import java.nio.charset.Charset
 import org.apache.mina.core.session.IdleStatus
+import java.util.logging.Logger
 
 /**
  * The point of this class is to provide a simple NIO server.
@@ -134,10 +135,14 @@ class PlainServer extends ServerSocket {
         socketAcceptor = new NioSocketAcceptor();
         socketAcceptor.getFilterChain().addLast("logger", new LoggingFilter());
         socketAcceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
-        socketAcceptor.setHandler(ioHandler);
+        if (ioHandler != null)
+            socketAcceptor.setHandler(ioHandler);
         socketAcceptor.getSessionConfig().setReadBufferSize(2048);
         socketAcceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
-        socketAcceptor.bind(new InetSocketAddress(port));
+        if (ioHandler != null)
+            socketAcceptor.bind(new InetSocketAddress(port));
+        else
+            Logger.getLogger("PlainServer").warning("This plain socket server has no handler so won't start it.");
     }
 
     /**
