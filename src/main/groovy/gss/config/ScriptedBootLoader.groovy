@@ -30,6 +30,7 @@ package gss.config
 import gss.run.Booter
 import org.apache.commons.vfs.FileObject
 import java.util.concurrent.ConcurrentHashMap
+import org.apache.commons.vfs.FileType
 
 /**
  * The point of this class is to allow scripted classes to load at boot time.
@@ -48,8 +49,14 @@ class ScriptedBootLoader {
     /**
      * Given a FileObject a classes cache.
      */
-    protected ConcurrentHashMap<FileObject, Class> eventsObjects = new ConcurrentHashMap<FileObject, Class>();
-        /**
+    protected ConcurrentHashMap<FileObject, Class> classesCache = new ConcurrentHashMap<FileObject, Class>();
+
+    /**
+     * The classloader responsible for converting scripts to classes.
+     */
+    protected GroovyClassLoader gcl = new GroovyClassLoader();
+
+    /**
      * Constructor.
      * @param booter The booter that started this application.
      */
@@ -73,7 +80,23 @@ class ScriptedBootLoader {
     /**
      * Load the classes into cache from file.
      */
-    void load() {
+    protected void load() {
+        load(directory);
+    }
 
+    /**
+     * Load the classes from a directory into cache.
+     * @param fo
+     */
+    protected void load(FileObject fo) {
+        fo.children.each {
+            if (it.getType() == FileType.FOLDER)
+                load(it);
+            else {
+                if (it.type == FileType.FILE)
+                    if (it.getName().extension == "groovy")
+                        classesCache.put(it, gcl.parseClass(it.content.getInputStream()));
+            }
+        }
     }
 }

@@ -45,6 +45,7 @@ import gss.eventing.EventManagerHandler
 import org.apache.commons.vfs.FileType
 import gss.queueing.TestQueue
 import org.hibernate.cfg.AnnotationConfiguration
+import gss.config.ScriptedBootLoader
 
 /**
  * The point of this class is to provide a generic booter to be extended.
@@ -71,7 +72,13 @@ abstract class Booter {
      */
     protected EventManagerHandler eventManager;
 
+    /**
+     * The directory to use as the base.
+     */
     protected File workingDir;
+
+    protected ScriptedBootLoader scriptedBootLoader;
+
     /**
      * Lets do nothing in this constructor...
      */
@@ -117,11 +124,12 @@ abstract class Booter {
      */
     void parseArguments(OptionParser optionParser, OptionSet optionSet) {
         File configDir = ((File) optionSet.valueOf("configDir"));
-        workingDir = optionSet.valueOf("workingDir");
+        workingDir = (File)optionSet.valueOf("workingDir");
         workingDir.mkdirs();
         configDir.mkdirs();
         if (configDir.exists()) {
             config.setDirectory(configDir);
+            scriptedBootLoader = new ScriptedBootLoader(this);
             Logger.getLogger(Booter.class.getName()).info("Configuration directory being used " + configDir.getAbsolutePath());
         } else {
             Logger.getLogger(Booter.class.getName()).severe("Cannot continue configuration directory does not exist and cannot!\n" + configDir.getAbsolutePath());
