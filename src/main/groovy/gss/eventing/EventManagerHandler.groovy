@@ -505,6 +505,10 @@ class EventManagerHandler {
         Logger.getLogger(EventManagerHandler.getClass().getCanonicalName()).info("Cleared directory monitoring");
     }
 
+    /**
+     * Add a directory to be monitored for changes and files.
+     * @param fileObject The directory to monitor.
+     */
     void addDirectoryMonitoring(FileObject fileObject) {
         if (fileObject.type == FileType.FOLDER) {
             fileMonitor.addFile(fileObject);
@@ -522,8 +526,15 @@ class EventManagerHandler {
         }
     }
 
+    /**
+     * Remove a directory to not be monitored.
+     * @param fileObject The directory to remove.
+     */
     void removeDirectoryMonitoring(FileObject fileObject) {
         fileMonitor.removeFile(fileObject);
+        fileObject.getChildren().each {
+            fileMonitor.removeFile(fileObject);
+        }
         Logger.getLogger(EventManagerHandler.getClass().getCanonicalName()).info("Removed directory from monitoring ${fileObject}");
     }
 }
