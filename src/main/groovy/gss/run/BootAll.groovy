@@ -110,9 +110,9 @@ class BootAll {
                 File tempUniqueDirs = new File(configDir.getAbsolutePath().replace("\\", "/") + "hsqldb/");
                 Logger.getLogger("gss.BootAll").info("Creating database server");
                 if (uniqueDirs)
-                    Server.main(["-database", tempUniqueDirs, "-port " + optionSet.valueOf("hsqldb")]);
+                    Server.main(["-database.0" + tempUniqueDirs.getAbsolutePath(), "-port " + optionSet.valueOf("hsqldb")] as String[]);
                 else
-                    Server.main(["-database", configDir, "-port " + optionSet.valueOf("hsqldb")]);
+                    Server.main(["-database.0" + configDir.getAbsolutePath(), "-port " + optionSet.valueOf("hsqldb")] as String[]);
             }
         }
     }
