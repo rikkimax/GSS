@@ -25,16 +25,16 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package gss.processing.queueing
+package gss.queueing
 
 import gss.run.Booter
 
 /**
  * This class handles a list of all of the queues.
  */
-class QueueManager {
+class QueueHandler {
 
-    List<gss.queueing.QueueManager> queueManagers;
+    List<QueueManager> queueManagers;
 
     /**
      * The booter that created this instance.
@@ -42,29 +42,56 @@ class QueueManager {
     Booter booter;
 
     /**
+     * Minimum amount of memory per slot to keep spare.
+     */
+    private long minMemory = 30;
+
+    /**
+     * The last queue that was executed.
+     * Get the next queue in list...
+     */
+    private int lastQueueExecuted = -1;
+
+    /**
      * Initiation method.
      * @param booter The booter that created this instance.
      */
-    QueueManager(Booter booter) {
+    QueueHandler(Booter booter) {
         this.booter = booter;
         queueManagers = new ArrayList<gss.queueing.QueueManager>();
+        booter.config.getServers().each {
+            if (it.type == "current")
+                minMemory = (Integer) it.getOther().get("min_spare_mem_slot", 30);
+        }
+        minMemory = minMemory * 1024l * 1024l;
         Thread.start {
             while (booter.getKeepGoing()) {
                 // Do we have spare slots?
                 //      If so check for a new items on the queue that does
-
+                if (Runtime.getRuntime().freeMemory() >= minMemory) {
+                    if (queueManagers.size() > lastQueueExecuted)
+                        lastQueueExecuted++;
+                    else
+                        lastQueueExecuted = 0;
+                    if (queueManagers.size() > 0) {
+                        QueueManager queueManager = queueManagers.get(lastQueueExecuted);
+                        Object queuedItem = queueManager.getLast();
+                        booter.eventManager.trigger(queuedItem, queueManager, queuedItem);
+                    }
+                }
+                Runtime.getRuntime().gc();
                 sleep(100);
             }
         }
     }
 
     /**
-     * Add a classes QueueManager to the list to monitor.
-     * @param clasz The class to use for the QueueManager.
+     * Add a classes QueueHandler to the list to monitor.
+     * @param clasz The class to use for the QueueHandler.
      */
     void addQueue(Class clasz) {
-        QueueManager queueManager = Eval.me("QueueManager<${clasz.getCanonicalName()}> queueManager"
-                + " = new gss.queueing.QueueManager<${clasz.getCanonicalName()}>();");
+        QueueHandler queueManager = (QueueHandler)Eval.me("return QueueHandler<${clasz.getCanonicalName()}> queueManager"
+                + " = new gss.queueing.QueueHandler<${clasz.getCanonicalName()}>();");
         if (queueManager != null) {
             Boolean dont = false;
             queueManagers.each {
@@ -77,8 +104,8 @@ class QueueManager {
     }
 
     /**
-     * Remove a classes QueueManager from the list.
-     * @param clasz The class to use to get the QueueManager to remove.
+     * Remove a classes QueueHandler from the list.
+     * @param clasz The class to use to get the QueueHandler to remove.
      */
     void removeQueue(Class clasz) {
         queueManagers.each {
@@ -86,6 +113,4 @@ class QueueManager {
                 queueManagers.remove(it);
         }
     }
-
-
 }

@@ -34,6 +34,7 @@ import org.apache.commons.vfs.VFS
 import org.hibernate.cfg.AnnotationConfiguration
 import java.util.logging.Logger
 import com.esotericsoftware.kryo.Kryo
+import org.hibernate.ogm.cfg.OgmConfiguration
 
 /**
  * The purpose of this class is to provide a means in which configuration of the GSS framework is defined and stored.
@@ -54,6 +55,11 @@ class Config {
      * Annotation configuration for Hibernate for working with classes defined in configuration file.
      */
     private AnnotationConfiguration annotationConfiguration;
+
+    /**
+     * Configuration for Hibernate OGM if used. For working with classes defined in configuration file.
+     */
+    private OgmConfiguration ogmConfiguration;
 
     /**
      * Kryo serializer to be used with KryoNet server connector.
@@ -113,12 +119,14 @@ class Config {
     void setupHibernateFactory() {
         kryo = new Kryo();
         annotationConfiguration = new AnnotationConfiguration();
+        ogmConfiguration = new OgmConfiguration();
         serializedClasses.each {
             Class clasz = Eval.me("return ${it}.class;");
             if (clasz != null) {
                 kryo.register(clasz);
                 Logger.getLogger(this.getClass().getName()).info("Adding class " + clasz + " to annotated list");
                 annotationConfiguration.addAnnotatedClass(clasz);
+                ogmConfiguration.addAnnotatedClass(clasz);
             }
         }
     }
@@ -129,6 +137,14 @@ class Config {
      */
     AnnotationConfiguration getAnnotationConfiguration() {
         return annotationConfiguration;
+    }
+
+    /**
+     * Gets the AnnotationConfiguration to be used with Hibernate.
+     * @return The AnnotationConfiguration to be used.
+     */
+    OgmConfiguration getOgmConfiguration() {
+        return ogmConfiguration;
     }
 
     /**

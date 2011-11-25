@@ -34,3 +34,5 @@
 
     -   # Processing server (custom made)
         type: processing
+        other:
+            min_spare_mem_slot: 30

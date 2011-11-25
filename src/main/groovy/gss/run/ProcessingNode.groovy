@@ -27,7 +27,7 @@
 
 package gss.run
 
-import gss.processing.queueing.QueueManager
+import gss.queueing.QueueHandler
 
 /**
  *
@@ -42,7 +42,7 @@ class ProcessingNode extends Booter {
     /**
      * The manager that handles that handles queued items for events.
      */
-    QueueManager queueManager;
+    QueueHandler queueManager;
 
     /**
      * Start up initiation method but as a singleton..
@@ -69,7 +69,7 @@ class ProcessingNode extends Booter {
      * Starts up queueing listening.
      */
     void startUpQueueing() {
-         queueManager = new QueueManager(this);
+         queueManager = new QueueHandler(this);
     }
 
     /**

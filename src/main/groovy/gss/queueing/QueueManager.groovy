@@ -53,6 +53,17 @@ class QueueManager<T> {
      */
     QueueManager(Booter booter) {
         this.booter = booter;
+        Boolean readHas = false;
+        T.metaClass.getMethods().each {
+             if (it.getName() == "setRead") {
+                 readHas = true;
+             }
+        }
+        if (!readHas) {
+            T.metaClass.read = false;
+            T.metaClass."setRead" = {Boolean read-> this.read = read;};
+            T.metaClass."getRead" = {-> return read;};
+        }
     }
 
     /**

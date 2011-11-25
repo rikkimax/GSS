@@ -77,6 +77,9 @@ abstract class Booter {
      */
     protected File workingDir;
 
+    /**
+     * Loads in some code once... which can be used by anything.
+     */
     protected ScriptedBootLoader scriptedBootLoader;
 
     /**
