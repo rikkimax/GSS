@@ -4,8 +4,8 @@ SerializedClasses:
     - gss.queueing.TestQueue
 # Queues list of classes acts like SerializedClasses list but..
 # these have the added feature of being a queue as well.
-# If you want to add classes to handle it use the events system..
-# With list item with .class at end.
+# If you want to add classes to handle it use the events system or set the primary event..
+# With list item with .class at end for event system.
 queues:
     # queue class: queue handler (none for event system)
     gss.queueing.TestQueue: gss.eventing.UnknownEvent
