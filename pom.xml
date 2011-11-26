@@ -9,6 +9,7 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <scm>
+        <connection>scm:svn:http://javapixel.info/jenkins/plugin/repository/project/GSS/Build/</connection>
         <url>http://javapixel.info/jenkins/plugin/repository/project/GSS/Build/</url>
     </scm>
     <repositories>
