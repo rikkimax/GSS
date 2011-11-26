@@ -42,10 +42,8 @@ import gss.eventing.Event
 import gss.eventing.UnknownEvent
 import org.apache.commons.vfs.VFS
 import gss.eventing.EventManagerHandler
-import org.apache.commons.vfs.FileType
-import gss.queueing.TestQueue
-import org.hibernate.cfg.AnnotationConfiguration
 import gss.config.ScriptedBootLoader
+import gss.queueing.QueueHandler
 
 /**
  * The point of this class is to provide a generic booter to be extended.
@@ -81,6 +79,11 @@ abstract class Booter {
      * Loads in some code once... which can be used by anything.
      */
     protected ScriptedBootLoader scriptedBootLoader;
+
+    /**
+     * The manager that handles that handles queued items for events.
+     */
+    protected QueueHandler queueManager;
 
     /**
      * Lets do nothing in this constructor...
@@ -148,6 +151,8 @@ abstract class Booter {
     void startup() {
         if (keepGoingStartUp)
             startUpEventManager();
+        if (keepGoingStartUp)
+            startUpQueueing();
         if (keepGoingStartUp)
             startUpDataBase();
     }
@@ -221,6 +226,13 @@ abstract class Booter {
         if (!eventsDir.exists())
             eventsDir.createFolder();
         eventManager.addDirectoryMonitoring(eventsDir);
+    }
+
+    /**
+     * Starts up queueing listening.
+     */
+    void startUpQueueing() {
+        queueManager = new QueueHandler(this);
     }
 
     /**

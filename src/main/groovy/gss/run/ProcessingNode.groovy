@@ -27,8 +27,6 @@
 
 package gss.run
 
-import gss.queueing.QueueHandler
-
 /**
  *
  */
@@ -40,11 +38,6 @@ class ProcessingNode extends Booter {
     synchronized static ProcessingNode instance;
 
     /**
-     * The manager that handles that handles queued items for events.
-     */
-    synchronized QueueHandler queueManager;
-
-    /**
      * Start up initiation method but as a singleton..
      * @param args Arguments given to application
      */
@@ -53,23 +46,6 @@ class ProcessingNode extends Booter {
             instance = new ProcessingNode();
             instance.boot(args);
         }
-    }
-
-    /**
-     * An overidden method to provide extra start up procedures.
-     */
-    @Override
-    synchronized void startup() {
-        super.startup();
-        if (keepGoingStartUp)
-            startUpQueueing();
-    }
-
-    /**
-     * Starts up queueing listening.
-     */
-    synchronized void startUpQueueing() {
-        queueManager = new QueueHandler(this);
     }
 
     /**
