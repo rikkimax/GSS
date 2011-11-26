@@ -13,3 +13,4 @@ Content is a way to host and push out new content specifically for this server t
 Every node will be designed to be scaled in theory. The biggest draw back is that the database server may not cluster and propagate the updates in a timely fashion.
 
 For more information check out http://gameserversystem.wikispaces.com/
+For continuous integration server (Jenkins) http://javapixel.info/jenkins/job/GSS/
