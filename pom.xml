@@ -8,10 +8,6 @@
     <artifactId>GSS</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <scm>
-        <connection>scm:svn:http://javapixel.info/jenkins/plugin/repository/project/GSS/Build/</connection>
-        <url>http://javapixel.info/jenkins/plugin/repository/project/GSS/Build/</url>
-    </scm>
     <repositories>
         <repository>
             <id>clojars</id>
@@ -97,11 +93,11 @@
             <artifactId>mina-core</artifactId>
             <version>2.0.4</version>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>org.hibernate.ogm</groupId>
             <artifactId>hibernate-ogm-core</artifactId>
-            <version>3.0.0.Alpha2</version>
-        </dependency-->
+            <version>3.0.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
