@@ -35,10 +35,10 @@ import static gss.run.LoginNode.*
 
 public class LoginTest {
 
-    @Test
+    /*@Test
     public void testHelp() {
         LoginNode.main("");
-    }
+    }*/
 
     @Test
     public void testHelp2() {
