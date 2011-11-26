@@ -8,6 +8,9 @@
     <artifactId>GSS</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <scm>
+        <url>http://javapixel.info/jenkins/plugin/repository/project/GSS/Build/</url>
+    </scm>
     <repositories>
         <repository>
             <id>clojars</id>
