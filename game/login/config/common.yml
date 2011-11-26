@@ -7,7 +7,8 @@ SerializedClasses:
 # If you want to add classes to handle it use the events system..
 # With list item with .class at end.
 queues:
-     - # a.clasz.Name # We use a class here!
+    # queue class: queue handler (none for event system)
+    gss.queueing.TestQueue: gss.eventing.UnknownEvent
 events:
     # Provides a list of event triggors and there event classes
     -

@@ -32,6 +32,7 @@ import org.hibernate.Session
 import org.hibernate.Criteria
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
+import gss.eventing.Event
 
 /**
  * The point of this class is to provide an easy manager of queues
@@ -48,11 +49,17 @@ class QueueManager<T> {
     private final Class clasz = T;
 
     /**
+     * Primary event (overides event system).
+     */
+    public Event event;
+
+    /**
      * Initiation method.
      * @param booter The booter that created this instance.
      */
-    QueueManager(Booter booter) {
+    QueueManager(Booter booter, Event event) {
         this.booter = booter;
+        this.event = event;
         Boolean readHas = false;
         T.metaClass.getMethods().each {
             if (it.getName() == "setRead") {
@@ -64,6 +71,7 @@ class QueueManager<T> {
             T.metaClass."setRead" = {Boolean read -> this.read = read;};
             T.metaClass."getRead" = {-> return read;};
         }
+        event.create(T.getClass().getCanonicalName(), booter);
     }
 
     /**

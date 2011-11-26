@@ -37,7 +37,6 @@ import org.hibernate.SessionFactory
 import javax.persistence.EntityManager
 import org.hibernate.Session
 import org.apache.commons.vfs.FileObject
-import org.yaml.snakeyaml.Yaml
 import gss.eventing.Event
 import gss.eventing.UnknownEvent
 import org.apache.commons.vfs.VFS
@@ -227,12 +226,15 @@ abstract class Booter {
      */
     void startUpQueueing() {
         queueManager = new QueueHandler(this);
-        config.getCommon().get("queues", new ArrayList()).each {
-            it.each { ->
-                Class clasz = Eval.me("return ${it}.class;");
-                if (clasz != null)
-                    queueManager.addQueue(clasz);
-            }
+        config.getCommon().get("queues", new HashMap()).each {key, value ->
+            Class clasz = Eval.me("return ${key}.class;");
+            Event event = null;
+            if (value != null)
+                event = Eval.me("return new ${value}();");
+            if (clasz != null && event != null)
+                queueManager.addQueue(clasz, event);
+            else if (clasz != null)
+                queueManager.addQueue(clasz);
         }
     }
 

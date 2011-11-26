@@ -51,6 +51,9 @@ class Config {
      */
     private ArrayList<gss.config.Server> servers;
 
+    /**
+     * Common data shared between server.
+     */
     private Map common;
 
     /**
@@ -103,10 +106,8 @@ class Config {
         common = yaml.load(directory.resolveFile("common.yml").getContent().getInputStream());
         //lets dyanamically set which classes will be used for the database
         serializedClasses = common.get("SerializedClasses");
-        common.get("queues", new ArrayList()).each{
-            it.each {
-                serializedClasses.add(it);
-            }
+        common.get("queues", new HashMap()).each {key, value ->
+            serializedClasses.add(key);
         }
         setupHibernateFactory();
     }
@@ -175,6 +176,6 @@ class Config {
      * @return Common data shared between all server nodes in map format.
      */
     Map getCommon() {
-       return common;
+        return common;
     }
 }

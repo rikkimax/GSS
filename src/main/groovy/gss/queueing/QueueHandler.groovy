@@ -28,6 +28,7 @@
 package gss.queueing
 
 import gss.run.Booter
+import gss.eventing.Event
 
 /**
  * This class handles a list of all of the queues.
@@ -76,7 +77,10 @@ class QueueHandler {
                     if (queueManagers.size() > 0) {
                         QueueManager queueManager = queueManagers.get(lastQueueExecuted);
                         Object queuedItem = queueManager.getLast();
-                        booter.eventManager.trigger(queuedItem, queueManager, queuedItem);
+                        if (queueManager.event != null)
+                            queueManager.event.run(queuedItem.getClass().getCanonicalName(), queueManager, queuedItem);
+                        else
+                            booter.eventManager.trigger(queuedItem, queueManager, queuedItem);
                     }
                 }
                 Runtime.getRuntime().gc();
@@ -84,14 +88,20 @@ class QueueHandler {
             }
         }
     }
-
     /**
      * Add a classes QueueHandler to the list to monitor.
      * @param clasz The class to use for the QueueHandler.
      */
-    synchronized void addQueue(Class clasz) {
-        QueueHandler queueManager = (QueueHandler)Eval.me("return QueueHandler<${clasz.getCanonicalName()}> queueManager"
-                + " = new gss.queueing.QueueHandler<${clasz.getCanonicalName()}>();");
+    void addQueue(Class clasz) {
+        addQueue(clasz, null);
+    }
+    /**
+     * Add a classes QueueHandler to the list to monitor.
+     * @param clasz The class to use for the QueueHandler.
+     * @param event Primary event to use.
+     */
+    synchronized void addQueue(Class clasz, Event event) {
+        QueueManager queueManager = (QueueManager) Eval.xy(booter, event, "return new gss.queueing.QueueManager<${clasz.getCanonicalName()}>(x, y);");
         if (queueManager != null) {
             Boolean dont = false;
             queueManagers.each {
