@@ -114,7 +114,7 @@ class LoginNode extends Booter {
      * Gets the servers connectors.
      * @return The servers connectors.
      */
-    Servers getServers() {
+    synchronized Servers getServers() {
         return servers;
     }
 
@@ -122,7 +122,7 @@ class LoginNode extends Booter {
      * Lets get the instance of this booter.
      * @return The instance of this booter.
      */
-    LoginNode getInstance() {
+    synchronized LoginNode getInstance() {
         return instance;
     }
 
@@ -131,7 +131,7 @@ class LoginNode extends Booter {
      * @return The type of the server
      */
     @Override
-    String getType() {
+    synchronized String getType() {
         return "login";
     }
 }

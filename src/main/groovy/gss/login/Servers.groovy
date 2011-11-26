@@ -76,7 +76,7 @@ class Servers {
     /**
      * Start all server connectors.
      */
-    void start() {
+    synchronized void start() {
         sockets.each {
             it.start();
         }
@@ -85,7 +85,7 @@ class Servers {
     /**
      * Stops all server connectors.
      */
-    void stop() {
+    synchronized void stop() {
         sockets.each {
             it.stop();
         }

@@ -63,13 +63,13 @@ abstract class ServerSocket {
      * Sets the values of the socket.
      * @param values The values to set
      */
-    void setValues(HashMap<Object, Object> values) {}
+    synchronized void setValues(HashMap<Object, Object> values) {}
     /**
      * Start the connection
      */
-    void start() {}
+    synchronized void start() {}
     /**
      * Stop the connection
      */
-    void stop() {}
+    synchronized void stop() {}
 }

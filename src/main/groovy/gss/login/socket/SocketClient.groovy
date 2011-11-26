@@ -46,36 +46,36 @@ class SocketClient {
      * (ip=192.168.0.1,port=34527)34527.19216801
      * @return The string containing the ID of the connection.
      */
-    String getID() {}
+    synchronized String getID() {}
 
     /**
      * Get the IP of the client used.
      * @return The IP the client used.
      */
-    String getIP() {}
+    synchronized String getIP() {}
 
     /**
      * Get the port the client used.
      * @return The port the client used to connect.
      */
-    int getPort() {}
+    synchronized int getPort() {}
 
     /**
      * Send a message to the client
      * @param message The message.
      */
-    void sendMessage(Object message) {}
+    synchronized void sendMessage(Object message) {}
 
     /**
      * This should close the connection and remove it from the ServerSocket..
      */
-    void close() {}
+    synchronized void close() {}
 
     /**
      * Get the server socket (server connector).
      * @return The server connector.
      */
-    ServerSocket getServerSocket() {
+    synchronized ServerSocket getServerSocket() {
         return serverSocket;
     }
 
@@ -83,5 +83,5 @@ class SocketClient {
      * Get the time this message was received.
      * @return Time received.
      */
-    Long getTimeReceived() {};
+    synchronized Long getTimeReceived() {};
 }

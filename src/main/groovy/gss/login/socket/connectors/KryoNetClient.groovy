@@ -77,7 +77,7 @@ class KryoNetClient extends SocketClient {
      * Gets the IP of the client.
      * @return The IP of the client.
      */
-    String getIP() {
+    synchronized String getIP() {
         return connection.getRemoteAddressTCP().getAddress().getHostAddress();
     }
 
@@ -85,14 +85,14 @@ class KryoNetClient extends SocketClient {
      * Gets the port of the client.
      * @return The port of the client.
      */
-    int getPort() {
+    synchronized int getPort() {
         return connection.getRemoteAddressTCP().getPort();
     }
 
     /**
      * Closes the connection to the client.
      */
-    void close() {
+    synchronized void close() {
         connection.close();
     }
 
@@ -100,7 +100,7 @@ class KryoNetClient extends SocketClient {
      * Gets the connection to the user.
      * @return The connection to the user.
      */
-    Connection getConnection() {
+    synchronized Connection getConnection() {
         return connection;
     }
 
@@ -113,7 +113,7 @@ class KryoNetClient extends SocketClient {
      * 19216801.34527 -> 72543.10861291 -> kryo.72543.10861291 -> kry o.7 254 3.1 086 129 1 -> 1kry3.1o.7254086129
      * @return The string containing the ID of the connection.
      */
-    String getID() {
+    synchronized String getID() {
         String ip = getIP().replace(".", "");
         String ipPort = getPort() + "." + ip;
         if (simpleID)
@@ -146,7 +146,7 @@ class KryoNetClient extends SocketClient {
      * Gets the game server socket connector.
      * @return The game server socket.
      */
-    ServerSocket getServerSocket() {
+    synchronized ServerSocket getServerSocket() {
         return serverSocket;
     }
 
@@ -154,7 +154,7 @@ class KryoNetClient extends SocketClient {
      * Sends a message to the client using a serialized class.
      * @param message The message to send.
      */
-    void sendMessage(Object message) {
+    synchronized void sendMessage(Object message) {
         connection.sendTCP(message);
     }
 
@@ -162,7 +162,7 @@ class KryoNetClient extends SocketClient {
      * Gets the time the last message was received (creation of this class).
      * @return The time we received a message and created this class object.
      */
-    Long getTimeReceived() {
+    synchronized Long getTimeReceived() {
         return receivedTime;
     }
 }

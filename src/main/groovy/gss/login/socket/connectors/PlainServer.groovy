@@ -76,7 +76,7 @@ class PlainServer extends ServerSocket {
      * @return All the clients.
      */
     @Override
-    SocketClient[] getClients() {
+    synchronized SocketClient[] getClients() {
         List<SocketClient> clients = new ArrayList<SocketClient>();
         socketAcceptor.getManagedSessions().values().each {
             clients.add(new PlainClient(this, it, simpleID));
@@ -103,7 +103,7 @@ class PlainServer extends ServerSocket {
      * @param values The values for the server.
      */
     @Override
-    void setValues(HashMap<Object, Object> values) {
+    synchronized void setValues(HashMap<Object, Object> values) {
         if (values.get("simpleID") != null)
             simpleID = values.get("simpleID");
         else if (values.get("simpleId") != null)
@@ -131,7 +131,7 @@ class PlainServer extends ServerSocket {
      * Start the server.
      */
     @Override
-    void start() {
+    synchronized void start() {
         socketAcceptor = new NioSocketAcceptor();
         socketAcceptor.getFilterChain().addLast("logger", new LoggingFilter());
         socketAcceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
@@ -149,7 +149,7 @@ class PlainServer extends ServerSocket {
      * Stop the server.
      */
     @Override
-    void stop() {
+    synchronized void stop() {
         socketAcceptor.unbind();
         socketAcceptor = null;
     }
@@ -158,7 +158,7 @@ class PlainServer extends ServerSocket {
      * Are we going to be using a simple id for clients?
      * @return Are we?
      */
-    Boolean getSimpleID() {
+    synchronized Boolean getSimpleID() {
         return simpleID;
     }
 }

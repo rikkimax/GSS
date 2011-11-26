@@ -77,7 +77,7 @@ class PlainClient extends SocketClient {
      * Gets the IP of the client.
      * @return The IP of the client.
      */
-    String getIP() {
+    synchronized String getIP() {
         return ((InetSocketAddress)connection.getRemoteAddress()).getAddress().getHostAddress();
     }
 
@@ -85,14 +85,14 @@ class PlainClient extends SocketClient {
      * Gets the port of the client.
      * @return The port of the client.
      */
-    int getPort() {
+    synchronized int getPort() {
         return ((InetSocketAddress)connection.getRemoteAddress()).getPort();
     }
 
     /**
      * Closes the connection to the client.
      */
-    void close() {
+    synchronized void close() {
         connection.close();
     }
 
@@ -100,7 +100,7 @@ class PlainClient extends SocketClient {
      * Gets the connection to the user.
      * @return The connection to the user.
      */
-    IoSession getConnection() {
+    synchronized IoSession getConnection() {
         return connection;
     }
 
@@ -113,7 +113,7 @@ class PlainClient extends SocketClient {
      * 19216801.34527 -> 72543.10861291 -> plain.72543.10861291 -> pla in. 725 43. 108 612 91 -> 91pla43.in.725108612
      * @return The string containing the ID of the connection.
      */
-    String getID() {
+    synchronized String getID() {
         String ip = getIP().replace(".", "");
         String ipPort = getPort() + "." + ip;
         if (simpleID)
@@ -146,7 +146,7 @@ class PlainClient extends SocketClient {
      * Sends a message to the client using a serialized class.
      * @param message The message to send.
      */
-    void sendMessage(Object message) {
+    synchronized void sendMessage(Object message) {
         connection.write(message.toString());
     }
 
@@ -154,7 +154,7 @@ class PlainClient extends SocketClient {
      * Gets the time the last message was received (creation of this class).
      * @return The time we received a message and created this class object.
      */
-    Long getTimeReceived() {
+    synchronized Long getTimeReceived() {
         return receivedTime;
     }
 }

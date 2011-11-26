@@ -89,7 +89,7 @@ class QueueHandler {
      * Add a classes QueueHandler to the list to monitor.
      * @param clasz The class to use for the QueueHandler.
      */
-    void addQueue(Class clasz) {
+    synchronized void addQueue(Class clasz) {
         QueueHandler queueManager = (QueueHandler)Eval.me("return QueueHandler<${clasz.getCanonicalName()}> queueManager"
                 + " = new gss.queueing.QueueHandler<${clasz.getCanonicalName()}>();");
         if (queueManager != null) {
@@ -107,7 +107,7 @@ class QueueHandler {
      * Remove a classes QueueHandler from the list.
      * @param clasz The class to use to get the QueueHandler to remove.
      */
-    void removeQueue(Class clasz) {
+    synchronized void removeQueue(Class clasz) {
         queueManagers.each {
             if (it.getClass() == clasz)
                 queueManagers.remove(it);

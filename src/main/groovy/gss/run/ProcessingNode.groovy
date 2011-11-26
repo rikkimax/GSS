@@ -37,12 +37,12 @@ class ProcessingNode extends Booter {
     /**
      * The instance for singleton running.
      */
-    static ProcessingNode instance;
+    synchronized static ProcessingNode instance;
 
     /**
      * The manager that handles that handles queued items for events.
      */
-    QueueHandler queueManager;
+    synchronized QueueHandler queueManager;
 
     /**
      * Start up initiation method but as a singleton..
@@ -59,7 +59,7 @@ class ProcessingNode extends Booter {
      * An overidden method to provide extra start up procedures.
      */
     @Override
-    void startup() {
+    synchronized void startup() {
         super.startup();
         if (keepGoingStartUp)
             startUpQueueing();
@@ -68,15 +68,15 @@ class ProcessingNode extends Booter {
     /**
      * Starts up queueing listening.
      */
-    void startUpQueueing() {
-         queueManager = new QueueHandler(this);
+    synchronized void startUpQueueing() {
+        queueManager = new QueueHandler(this);
     }
 
     /**
      * Lets get the instance of this booter.
      * @return The instance of this booter.
      */
-    ProcessingNode getInstance() {
+    synchronized ProcessingNode getInstance() {
         return instance;
     }
 
@@ -85,7 +85,7 @@ class ProcessingNode extends Booter {
      * @return The type of the server
      */
     @Override
-    String getType() {
+    synchronized String getType() {
         return "processing";
     }
 }

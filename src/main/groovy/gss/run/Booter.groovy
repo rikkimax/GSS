@@ -127,7 +127,7 @@ abstract class Booter {
      */
     void parseArguments(OptionParser optionParser, OptionSet optionSet) {
         File configDir = ((File) optionSet.valueOf("configDir"));
-        workingDir = (File)optionSet.valueOf("workingDir");
+        workingDir = (File) optionSet.valueOf("workingDir");
         workingDir.mkdirs();
         configDir.mkdirs();
         if (configDir.exists()) {
@@ -227,7 +227,7 @@ abstract class Booter {
      * Get the configuration class.
      * @return The config class instance.
      */
-    Config getConfig() {
+    synchronized Config getConfig() {
         return config;
     }
 
@@ -235,7 +235,7 @@ abstract class Booter {
      * Get the entity manager for Hibernate.
      * @return The entity manager.
      */
-    EntityManager getEntityManager() {
+    synchronized EntityManager getEntityManager() {
         return entityManager;
     }
 
@@ -243,7 +243,7 @@ abstract class Booter {
      * Get a new session to be used for Hibernate.
      * @return A new session to be used for Hibernate.
      */
-    Session getSession() {
+    synchronized Session getSession() {
         //give us a new session that is opened so we can work with the database
         return sessionFactory.openSession();
     }
@@ -252,7 +252,7 @@ abstract class Booter {
      * Gets the event manager.
      * @return The event manager.
      */
-    EventManagerHandler getEventManager() {
+    synchronized EventManagerHandler getEventManager() {
         return eventManager;
     }
 
@@ -260,7 +260,7 @@ abstract class Booter {
      * Get the type of the server.
      * @return The type of the server.
      */
-    String getType() {
+    synchronized String getType() {
         return "booter";
     }
 
@@ -268,7 +268,7 @@ abstract class Booter {
      * Gets the current working directory.
      * @return The current working directory.
      */
-    File getWorkingDir() {
+    synchronized File getWorkingDir() {
         return workingDir;
     }
 
@@ -276,7 +276,7 @@ abstract class Booter {
      * Gets the current working directory.
      * @return The current working directory.
      */
-    FileObject getWorkingDirFileObject() {
+    synchronized FileObject getWorkingDirFileObject() {
         return VFS.getManager().resolveFile(workingDir.getAbsolutePath());
     }
 
@@ -284,7 +284,7 @@ abstract class Booter {
      * Do keep the server going?
      * @return Keep the server going value.
      */
-    Boolean getKeepGoing() {
+    synchronized Boolean getKeepGoing() {
         return keepGoingStartUp;
     }
 }

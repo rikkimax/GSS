@@ -55,13 +55,13 @@ class QueueManager<T> {
         this.booter = booter;
         Boolean readHas = false;
         T.metaClass.getMethods().each {
-             if (it.getName() == "setRead") {
-                 readHas = true;
-             }
+            if (it.getName() == "setRead") {
+                readHas = true;
+            }
         }
         if (!readHas) {
             T.metaClass.read = false;
-            T.metaClass."setRead" = {Boolean read-> this.read = read;};
+            T.metaClass."setRead" = {Boolean read -> this.read = read;};
             T.metaClass."getRead" = {-> return read;};
         }
     }
@@ -70,7 +70,7 @@ class QueueManager<T> {
      * Get the last item in the queue.
      * @return The last item in the queue.
      */
-    T getLast() {
+    synchronized T getLast() {
         Session session = booter.getSession();
         session.beginTransaction();
         Criteria criteria = session.createCriteria(T);
@@ -90,7 +90,7 @@ class QueueManager<T> {
      * Save an item.
      * @param object The item to save.
      */
-    void save(T object) {
+    synchronized void save(T object) {
         Session session = booter.getSession();
         session.beginTransaction();
         session.save(object);
@@ -101,7 +101,7 @@ class QueueManager<T> {
      * Delete an item.
      * @param object The item to delete.
      */
-    void delete(T object) {
+    synchronized void delete(T object) {
         Session session = booter.getSession();
         session.beginTransaction();
         session.delete(object);
@@ -112,7 +112,7 @@ class QueueManager<T> {
      * Mark an item as read.
      * @param object The item to mark.
      */
-    void mark(T object) {
+    synchronized void mark(T object) {
         Eval.x(object, "x.setRead(true);");
         save(object);
     }
@@ -121,7 +121,7 @@ class QueueManager<T> {
      * Unmark an item as read.
      * @param object An item to unmark.
      */
-    void unmark(T object) {
+    synchronized void unmark(T object) {
         Eval.x(object, "x.setRead(false);");
         save(object);
     }
@@ -130,7 +130,7 @@ class QueueManager<T> {
      * The class we are using.
      * @return Class we are using.
      */
-    Class<T> getClassUsed() {
+    synchronized Class<T> getClassUsed() {
         return T;
     }
 }

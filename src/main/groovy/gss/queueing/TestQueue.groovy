@@ -65,7 +65,7 @@ class TestQueue {
      * When this item was added to the queue.
      * @return Time this item was added to the queue.
      */
-    Long getCreated() {
+    synchronized Long getCreated() {
         return this.created
     }
 
@@ -73,7 +73,7 @@ class TestQueue {
      * Set when this item was added to the queue.
      * @param time The time when this item was added to the queue.
      */
-    void setCreated(Long time) {
+    synchronized void setCreated(Long time) {
         created = time;
     }
 
@@ -81,7 +81,7 @@ class TestQueue {
      * Get if this item been read yet?
      * @return Has this item been read yet?
      */
-    Boolean getRead() {
+    synchronized Boolean getRead() {
         return read;
     }
 
@@ -89,7 +89,7 @@ class TestQueue {
      * Set if this item has been read yet.
      * @param read If this item has been read yet.
      */
-    void setRead(Boolean read) {
+    synchronized void setRead(Boolean read) {
         this.read = read;
     }
 
@@ -97,7 +97,7 @@ class TestQueue {
      * Set test string.
      * @param test The string to set to.
      */
-    void setTest(String test) {
+    synchronized void setTest(String test) {
         this.test = test;
     }
 
@@ -105,7 +105,7 @@ class TestQueue {
      * Get the test string.
      * @return The test string.
      */
-    String getTest() {
+    synchronized String getTest() {
         return test;
     }
 }

@@ -61,7 +61,7 @@ abstract class PlainClientHandler extends IoHandlerAdapter {
      * @param message The message received.
      */
     @Override
-    void messageReceived(IoSession session, Object message) {
+    synchronized void messageReceived(IoSession session, Object message) {
         Object messageToEvent = message;
         Boolean eventThis = false;
         PlainClient plainClient = new PlainClient(server, session, server.getSimpleID());
@@ -72,5 +72,5 @@ abstract class PlainClientHandler extends IoHandlerAdapter {
             loginNode.eventManager.trigger(message, plainClient, messageToEvent);
     }
 
-    abstract Object messageProcess(PlainClient plainClient, Object message);
+    synchronized abstract Object messageProcess(PlainClient plainClient, Object message);
 }
