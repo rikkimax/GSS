@@ -227,7 +227,13 @@ abstract class Booter {
      */
     void startUpQueueing() {
         queueManager = new QueueHandler(this);
-
+        config.getCommon().get("queues", new ArrayList()).each {
+            it.each { ->
+                Class clasz = Eval.me("return ${it}.class;");
+                if (clasz != null)
+                    queueManager.addQueue(clasz);
+            }
+        }
     }
 
     /**

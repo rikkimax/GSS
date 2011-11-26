@@ -1,6 +1,13 @@
+# A list of classes which will be serialized into the database.
 SerializedClasses:
     - gss.eventing.UnknownEvent
     - gss.queueing.TestQueue
+# Queues list of classes acts like SerializedClasses list but..
+# these have the added feature of being a queue as well.
+# If you want to add classes to handle it use the events system..
+# With list item with .class at end.
+queues:
+     - # a.clasz.Name # We use a class here!
 events:
     # Provides a list of event triggors and there event classes
     -

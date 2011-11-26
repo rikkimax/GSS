@@ -103,6 +103,11 @@ class Config {
         common = yaml.load(directory.resolveFile("common.yml").getContent().getInputStream());
         //lets dyanamically set which classes will be used for the database
         serializedClasses = common.get("SerializedClasses");
+        common.get("queues", new ArrayList()).each{
+            it.each {
+                serializedClasses.add(it);
+            }
+        }
         setupHibernateFactory();
     }
 
