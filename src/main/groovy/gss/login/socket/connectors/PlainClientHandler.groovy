@@ -72,5 +72,5 @@ abstract class PlainClientHandler extends IoHandlerAdapter {
             loginNode.eventManager.trigger(message, plainClient, messageToEvent);
     }
 
-    synchronized abstract Object messageProcess(PlainClient plainClient, Object message);
+    abstract Object messageProcess(PlainClient plainClient, Object message);
 }

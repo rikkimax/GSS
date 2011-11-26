@@ -51,6 +51,8 @@ class Config {
      */
     private ArrayList<gss.config.Server> servers;
 
+    private Map common;
+
     /**
      * Annotation configuration for Hibernate for working with classes defined in configuration file.
      */
@@ -98,7 +100,7 @@ class Config {
         //does it need to be dynamic?
         Yaml2 yaml = new Yaml2();
         servers = yaml.load(directory.resolveFile("servers.yml").getContent().getInputStream(), Server.class);
-        Map common = yaml.load(directory.resolveFile("common.yml").getContent().getInputStream());
+        common = yaml.load(directory.resolveFile("common.yml").getContent().getInputStream());
         //lets dyanamically set which classes will be used for the database
         serializedClasses = common.get("SerializedClasses");
         setupHibernateFactory();
@@ -161,5 +163,13 @@ class Config {
      */
     List<String> getSerializedClasses() {
         return serializedClasses;
+    }
+
+    /**
+     * Common data shared between all server nodes.
+     * @return Common data shared between all server nodes in map format.
+     */
+    Map getCommon() {
+       return common;
     }
 }

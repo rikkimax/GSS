@@ -189,20 +189,14 @@ abstract class Booter {
      */
     void startUpEventManager() {
         eventManager = new EventManagerHandler(this);
-        FileObject eventsFO = config.getDirectory()?.resolveFile("events.yml");
-        if (eventsFO?.exists()) {
-            //Our type has a configuration directory and events file
-            Yaml yaml = new Yaml();
-            List<HashMap<String, List<String>>> content = yaml.load(eventsFO.content.inputStream);
-            content.each {triggersEvents ->
-                triggersEvents.each {eventTrigger, events ->
-                    events.each {event ->
-                        Object eventTriggerEvaled = Eval.me("return ${eventTrigger};");
-                        Object eventEvaled = Eval.me("return new ${event}();");
-                        if (eventTriggerEvaled != null && eventEvaled != null) {
-                            if (eventEvaled instanceof Event)
-                                eventManager.addEvent(eventTriggerEvaled, eventEvaled);
-                        }
+        config.getCommon().get("events", new ArrayList()).each {triggersEvents ->
+            triggersEvents.each {eventTrigger, events ->
+                events.each {event ->
+                    Object eventTriggerEvaled = Eval.me("return ${eventTrigger};");
+                    Object eventEvaled = Eval.me("return new ${event}();");
+                    if (eventTriggerEvaled != null && eventEvaled != null) {
+                        if (eventEvaled instanceof Event)
+                            eventManager.addEvent(eventTriggerEvaled, eventEvaled);
                     }
                 }
             }
@@ -233,6 +227,7 @@ abstract class Booter {
      */
     void startUpQueueing() {
         queueManager = new QueueHandler(this);
+
     }
 
     /**

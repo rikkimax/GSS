@@ -1,4 +1,0 @@
-# Provides a list of event triggors and there event classes
-    -
-        # gss.eventing.UnknownEvent.class: # We use an object, class or a String here! But Strings need to be enclosed in ""
-            # - gss.eventing.UnknownEvent # This class does nothing.. not really needed but good as an example
