@@ -8,6 +8,18 @@
     <artifactId>GSS</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>JavaPixel releases</name>
+            <url>http://javapixel.info/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>JavaPixel snapshots</name>
+            <url>http://javapixel.info/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
     <repositories>
         <repository>
             <id>clojars</id>
