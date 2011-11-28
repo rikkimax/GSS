@@ -25,52 +25,71 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package gss.login.socket.connectors
 
-import org.apache.mina.core.service.IoHandlerAdapter
-import org.apache.mina.core.session.IoSession
-import gss.run.LoginNode
+
+package gss.login
+
+import gss.login.socket.ServerConnection
 
 /**
- * The point of this class is to handle data from a plain client server.
+ * The point of this class is to store the server connection connectors.
  */
-abstract class PlainClientHandler extends IoHandlerAdapter {
-    /**
-     * The login node that started all this.
-     */
-    LoginNode loginNode;
+class ServerConnections {
 
     /**
-     * The socket server that needs this handler.
+     * The list of server connectors.
      */
-    PlainServer server;
+    private ArrayList<ServerConnection> sockets = new ArrayList<ServerConnection>();
 
     /**
-     * Constructor method.
-     * @param server The socket server that needs this handler.
-     * @param loginNode The LoginNode that started this.
+     * Add a new server connector.
+     * @param serverSocket The server connector to add.
      */
-    PlainClientHandler(PlainServer server, LoginNode loginNode) {
-        this.server = server;
-        this.loginNode = loginNode;
+    void addSocket(ServerConnection serverSocket) {
+        sockets.add(serverSocket);
     }
 
     /**
-     * When a message is received do run this.
-     * @param session The client.
-     * @param message The message received.
+     * Remove a server connector.
+     * @param serverSocket The server connector to remove.
      */
-    @Override
-    synchronized void messageReceived(IoSession session, Object message) {
-        Object messageToEvent = message;
-        Boolean eventThis = false;
-        PlainClient plainClient = new PlainClient(server, session, server.getSimpleID());
-        messageToEvent = messageProcess(plainClient, message);
-        if (messageToEvent == null)
-            eventThis = false;
-        if (eventThis)
-            loginNode.eventManager.trigger(message, plainClient, messageToEvent);
+    void removeSocket(ServerConnection serverSocket) {
+        sockets.remove(serverSocket);
+        serverSocket.stop();
     }
 
-    abstract Object messageProcess(PlainClient plainClient, Object message);
+    /**
+     * Get all the servers connectors.
+     * @return All the server connectors.
+     */
+    ArrayList<ServerConnection> getSockets() {
+        return sockets;
+    }
+
+    /**
+     * Removes all server connectors.
+     */
+    void clear() {
+        sockets.each {
+            removeSocket(it);
+        }
+    }
+
+    /**
+     * Start all server connectors.
+     */
+    synchronized void start() {
+        sockets.each {
+            it.start();
+        }
+    }
+
+    /**
+     * Stops all server connectors.
+     */
+    synchronized void stop() {
+        sockets.each {
+            it.stop();
+        }
+    }
 }

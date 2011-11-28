@@ -27,7 +27,6 @@
 
 package gss.login.socket
 
-import gss.run.Booter
 import gss.run.LoginNode
 /**
  * An extended (to be implemented) class to offer an interface for connections.

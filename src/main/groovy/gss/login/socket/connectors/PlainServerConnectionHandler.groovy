@@ -32,9 +32,9 @@ import org.apache.mina.core.session.IoSession
 import gss.run.LoginNode
 
 /**
- * The point of this class is to handle data from a plain client server.
+ *  The point of this class is to handle data from a plain client.
  */
-abstract class PlainClientHandler extends IoHandlerAdapter {
+abstract class PlainServerConnectionHandler extends IoHandlerAdapter {
     /**
      * The login node that started all this.
      */
@@ -43,28 +43,23 @@ abstract class PlainClientHandler extends IoHandlerAdapter {
     /**
      * The socket server that needs this handler.
      */
-    PlainServer server;
+    PlainServerConnection server;
 
     /**
      * Constructor method.
      * @param server The socket server that needs this handler.
      * @param loginNode The LoginNode that started this.
      */
-    PlainClientHandler(PlainServer server, LoginNode loginNode) {
+    PlainServerConnectionHandler(PlainServerConnection server, LoginNode loginNode) {
         this.server = server;
         this.loginNode = loginNode;
     }
 
-    /**
-     * When a message is received do run this.
-     * @param session The client.
-     * @param message The message received.
-     */
     @Override
-    synchronized void messageReceived(IoSession session, Object message) {
+    void messageReceived(IoSession session, Object message) {
         Object messageToEvent = message;
         Boolean eventThis = false;
-        PlainClient plainClient = new PlainClient(server, session, server.getSimpleID());
+        PlainServerConnectionMessage plainClient = new PlainServerConnectionMessage(server, message);
         messageToEvent = messageProcess(plainClient, message);
         if (messageToEvent == null)
             eventThis = false;
@@ -72,5 +67,7 @@ abstract class PlainClientHandler extends IoHandlerAdapter {
             loginNode.eventManager.trigger(message, plainClient, messageToEvent);
     }
 
-    abstract Object messageProcess(PlainClient plainClient, Object message);
+    abstract Object messageProcess(PlainServerConnectionMessage plainClient, Object message)
+
+    ;
 }

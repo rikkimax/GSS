@@ -25,52 +25,79 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package gss.login.socket.connectors
+package gss.login.socket
 
-import org.apache.mina.core.service.IoHandlerAdapter
-import org.apache.mina.core.session.IoSession
 import gss.run.LoginNode
 
 /**
- * The point of this class is to handle data from a plain client server.
+ * An extended (to be implemented) class to offer an interface for connections to servers.
  */
-abstract class PlainClientHandler extends IoHandlerAdapter {
+abstract class ServerConnection {
     /**
-     * The login node that started all this.
+     * Who created us.
      */
-    LoginNode loginNode;
+    protected LoginNode loginNode;
 
     /**
-     * The socket server that needs this handler.
+     * The server host / ip we are connecting to.
      */
-    PlainServer server;
+    protected String server;
 
     /**
-     * Constructor method.
-     * @param server The socket server that needs this handler.
-     * @param loginNode The LoginNode that started this.
+     * The server port we are connecting to.
      */
-    PlainClientHandler(PlainServer server, LoginNode loginNode) {
-        this.server = server;
+    protected int port;
+
+    /**
+     * We need to store who created us.
+     * @param booter The booter who created us.
+     */
+    ServerConnection(LoginNode loginNode) {
         this.loginNode = loginNode;
     }
 
     /**
-     * When a message is received do run this.
-     * @param session The client.
-     * @param message The message received.
+     * Sets the values of the socket.
+     * @param values The values to set
      */
-    @Override
-    synchronized void messageReceived(IoSession session, Object message) {
-        Object messageToEvent = message;
-        Boolean eventThis = false;
-        PlainClient plainClient = new PlainClient(server, session, server.getSimpleID());
-        messageToEvent = messageProcess(plainClient, message);
-        if (messageToEvent == null)
-            eventThis = false;
-        if (eventThis)
-            loginNode.eventManager.trigger(message, plainClient, messageToEvent);
+    synchronized void setValues(HashMap<Object, Object> values) {}
+    /**
+     * Start the connection
+     */
+    synchronized void start() {}
+    /**
+     * Stop the connection
+     */
+    synchronized void stop() {}
+
+    /**
+     * Get the server host / ip.
+     * @return The server host / ip we are connecting to.
+     */
+    String getServerHost() {
+        return server;
     }
 
-    abstract Object messageProcess(PlainClient plainClient, Object message);
+    /**
+     * The server port.
+     * @return The server port we are connecting to.
+     */
+    int getServerPort() {
+        return port;
+    }
+
+    /**
+     * Is the connection connected to the server?
+     * @return Is the connection connected to the server?
+     */
+    Boolean isConnected() {
+        return false;
+    }
+
+    /**
+     * Send a message to the server.
+     * @param message The message to send.
+     */
+    void sendMessage(Object message) {
+    }
 }

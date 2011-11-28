@@ -27,50 +27,67 @@
 
 package gss.login.socket.connectors
 
-import org.apache.mina.core.service.IoHandlerAdapter
-import org.apache.mina.core.session.IoSession
-import gss.run.LoginNode
+import gss.login.socket.ServerConnectionMessage
 
 /**
- * The point of this class is to handle data from a plain client server.
+ * The point of this class is to wrap a message received from a server.
  */
-abstract class PlainClientHandler extends IoHandlerAdapter {
+class PlainServerConnectionMessage extends ServerConnectionMessage {
     /**
-     * The login node that started all this.
+     * The message received.
      */
-    LoginNode loginNode;
+    private Object message;
 
     /**
-     * The socket server that needs this handler.
+     *  The time this message was received.
      */
-    PlainServer server;
+    private Long received;
 
-    /**
-     * Constructor method.
-     * @param server The socket server that needs this handler.
-     * @param loginNode The LoginNode that started this.
-     */
-    PlainClientHandler(PlainServer server, LoginNode loginNode) {
-        this.server = server;
-        this.loginNode = loginNode;
+    PlainServerConnectionMessage(PlainServerConnection serverConnection, Object message) {
+        super(serverConnection);
+        received = System.currentTimeMillis();
     }
 
     /**
-     * When a message is received do run this.
-     * @param session The client.
-     * @param message The message received.
+     * The id of this connection from the server connection.
+     * @return The id of this connection.
      */
     @Override
-    synchronized void messageReceived(IoSession session, Object message) {
-        Object messageToEvent = message;
-        Boolean eventThis = false;
-        PlainClient plainClient = new PlainClient(server, session, server.getSimpleID());
-        messageToEvent = messageProcess(plainClient, message);
-        if (messageToEvent == null)
-            eventThis = false;
-        if (eventThis)
-            loginNode.eventManager.trigger(message, plainClient, messageToEvent);
+    synchronized String getID() {
+        return ((PlainServerConnection) serverConnection).getId();
     }
 
-    abstract Object messageProcess(PlainClient plainClient, Object message);
+    /**
+     * Send a message to the server.
+     * @param message The message to send.
+     */
+    @Override
+    synchronized void sendMessage(Object message) {
+        ((PlainServerConnection) serverConnection).sendMessage(message);
+    }
+
+    /**
+     * Close this connection and server connection.
+     */
+    @Override
+    synchronized void close() {
+        serverConnection.stop();
+    }
+
+    /**
+     * Get the time this message was received.
+     * @return The time this message was received.
+     */
+    @Override
+    synchronized Long getTimeReceived() {
+        return received;
+    }
+
+    /**
+     * Get the message that was received.
+     * @return The message that was received.
+     */
+    synchronized Object getMessage() {
+        return message;
+    }
 }

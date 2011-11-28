@@ -40,6 +40,8 @@ import gss.login.socket.ServerSocket
 import gss.login.Servers
 import gss.queueing.TestQueue
 import gss.queueing.QueueManager
+import gss.login.socket.ServerConnection
+import gss.login.ServerConnections
 
 /**
  * This is a booter class, it will start every thing up for the login node.
@@ -50,6 +52,11 @@ class LoginNode extends Booter {
      * All the servers available from configuration file.
      */
     private Servers servers;
+
+    /**
+     * All the servers connections available from configuration file.
+     */
+    private ServerConnections serverConnections;
 
     /**
      * Lets store a copy of this booter instance...
@@ -102,12 +109,20 @@ class LoginNode extends Booter {
                         ServerSocket serverConnector = serverClassObject;
                         serverConnector.setValues(serverValue);
                         servers.addSocket(serverConnector);
-                        println("Started ---" + serverConnector);
+                        Logger.getLogger(this.getClass().getCanonicalName()).info("Added server socket ${serverConnector}");
+                    }
+                } else if (serverClassObject instanceof ServerConnection) {
+                    for (HashMap<Object> serverValue: values) {
+                        ServerConnection serverConnector = serverClassObject;
+                        serverConnector.setValues(serverValue);
+                        serverConnections.addSocket(serverConnector);
+                        Logger.getLogger(this.getClass().getCanonicalName()).info("Added server connection socket ${serverConnector}");
                     }
                 }
             }
         }
         servers.start();
+        serverConnections.start();
     }
 
     /**
@@ -116,6 +131,14 @@ class LoginNode extends Booter {
      */
     synchronized Servers getServers() {
         return servers;
+    }
+
+    /**
+     * Gets the servers connections.
+     * @return The servers connections.
+     */
+    synchronized ServerConnections getServersConnections() {
+        return serversConnections;
     }
 
     /**
