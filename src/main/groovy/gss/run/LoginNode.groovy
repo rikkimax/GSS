@@ -91,6 +91,7 @@ class LoginNode extends Booter {
     void startUpServers() {
         //find current server details from config
         servers = new Servers();
+        serverConnections = new ServerConnections();
         Server current;
         HashMap configH = new HashMap();
         for (Server server: config.getServers()) {
