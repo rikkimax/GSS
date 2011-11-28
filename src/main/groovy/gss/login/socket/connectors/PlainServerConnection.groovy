@@ -143,6 +143,8 @@ class PlainServerConnection extends ServerConnection {
         socketConnector = new NioSocketConnector();
         keepGoing = true;
         socketConnector.setConnectTimeoutMillis(timeout);
+        socketConnector.getFilterChain().addLast("codec",
+                new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
         if (ioHandler != null)
             socketConnector.setHandler(ioHandler);
         Thread.start {
