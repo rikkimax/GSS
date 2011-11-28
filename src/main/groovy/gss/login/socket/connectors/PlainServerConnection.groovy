@@ -145,10 +145,6 @@ class PlainServerConnection extends ServerConnection {
         socketConnector.setConnectTimeoutMillis(timeout);
         if (ioHandler != null)
             socketConnector.setHandler(ioHandler);
-        socketConnector.getFilterChain().addLast(
-                "codec",
-                new ProtocolCodecFilter(
-                        new ObjectSerializationCodecFactory()));
         Thread.start {
             while (keepGoing && loginNode.keepGoing) {
                 try {
@@ -156,11 +152,13 @@ class PlainServerConnection extends ServerConnection {
                     future.awaitUninterruptibly();
                     session = future.getSession();
                     keepGoing = false;
+                    loginNode.getEventManager().trigger("created", this, session);
                 } catch (RuntimeIoException e) {
                     e.printStackTrace();
                     Thread.sleep(5000);
                 }
             }
+            loginNode.getEventManager().trigger("destroyed", this, socketConnector);
             if (session != null)
                 session.getCloseFuture().awaitUninterruptibly();
             socketConnector.dispose();
