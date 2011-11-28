@@ -45,7 +45,7 @@ class QueueHandler {
     /**
      * Minimum amount of memory per slot to keep spare.
      */
-    private long minMemory = 30;
+    private long minMemory = 5;
 
     /**
      * The last queue that was executed.

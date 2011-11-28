@@ -71,7 +71,7 @@ class PlainServerConnection extends ServerConnection {
     /**
      * The session to the server.
      */
-    private synchronized IoSession session;
+    private IoSession session;
 
     PlainServerConnection(LoginNode loginNode) {
         super(loginNode);
