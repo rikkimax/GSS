@@ -146,21 +146,18 @@ class PlainServerConnection extends ServerConnection {
         if (ioHandler != null)
             socketConnector.setHandler(ioHandler);
         Thread.start {
-            while (keepGoing && loginNode.keepGoing) {
+            for (;;) {
                 try {
                     ConnectFuture future = socketConnector.connect(new InetSocketAddress(server, port));
                     future.awaitUninterruptibly();
                     session = future.getSession();
-                    loginNode.getEventManager().trigger("created", this, session);
+                    break;
                 } catch (RuntimeIoException e) {
-                    keepGoing = false;
                     e.printStackTrace();
                     Thread.sleep(5000);
                 }
             }
-            loginNode.getEventManager().trigger("destroyed", this, socketConnector);
-            if (session != null)
-                session.getCloseFuture().awaitUninterruptibly();
+            session?.getCloseFuture()?.awaitUninterruptibly();
             socketConnector.dispose();
         }
     }

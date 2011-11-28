@@ -70,4 +70,18 @@ abstract class PlainServerConnectionHandler extends IoHandlerAdapter {
     abstract Object messageProcess(PlainServerConnectionMessage plainClient, Object message)
 
     ;
+
+    @Override
+    void sessionOpened(IoSession session) {
+        super.sessionOpened(session);
+        loginNode.getEventManager().trigger("created", server, session);
+    }
+
+    @Override
+    void sessionClosed(IoSession session) {
+        super.sessionClosed(session);
+        loginNode.getEventManager().trigger("destroyed", server, session);
+    }
+
+
 }
