@@ -6,7 +6,7 @@
     <name>GSS</name>
     <groupId>info.javapixel.gss</groupId>
     <artifactId>GSS</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <scm>
         <connection>scm:git:git://git@github.com/rikkimax/GSS.git</connection>
