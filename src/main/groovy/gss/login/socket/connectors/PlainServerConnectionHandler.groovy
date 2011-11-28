@@ -64,7 +64,7 @@ abstract class PlainServerConnectionHandler extends IoHandlerAdapter {
         if (messageToEvent == null)
             eventThis = false;
         if (eventThis)
-            loginNode.eventManager.trigger(message, plainClient, messageToEvent);
+            loginNode.eventManager.trigger("received", plainClient, messageToEvent);
     }
 
     abstract Object messageProcess(PlainServerConnectionMessage plainClient, Object message)
@@ -82,6 +82,4 @@ abstract class PlainServerConnectionHandler extends IoHandlerAdapter {
         super.sessionClosed(session);
         loginNode.getEventManager().trigger("destroyed", server, session);
     }
-
-
 }
