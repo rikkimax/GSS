@@ -151,9 +151,9 @@ class PlainServerConnection extends ServerConnection {
                     ConnectFuture future = socketConnector.connect(new InetSocketAddress(server, port));
                     future.awaitUninterruptibly();
                     session = future.getSession();
-                    keepGoing = false;
                     loginNode.getEventManager().trigger("created", this, session);
                 } catch (RuntimeIoException e) {
+                    keepGoing = false;
                     e.printStackTrace();
                     Thread.sleep(5000);
                 }
