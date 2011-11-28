@@ -188,15 +188,13 @@ abstract class Booter {
      */
     void startUpEventManager() {
         eventManager = new EventManagerHandler(this);
-        config.getCommon().get("events", new ArrayList()).each {triggersEvents ->
-            triggersEvents.each {eventTrigger, events ->
-                events.each {event ->
-                    Object eventTriggerEvaled = Eval.me("return ${eventTrigger};");
-                    Object eventEvaled = Eval.me("return new ${event}();");
-                    if (eventTriggerEvaled != null && eventEvaled != null) {
-                        if (eventEvaled instanceof Event)
-                            eventManager.addEvent(eventTriggerEvaled, eventEvaled);
-                    }
+        config.getCommon().get("events", new HashMap()).each {eventTrigger, events ->
+            events.each {event ->
+                Object eventTriggerEvaled = Eval.me("return ${eventTrigger};");
+                Object eventEvaled = Eval.me("return new ${event}();");
+                if (eventTriggerEvaled != null && eventEvaled != null) {
+                    if (eventEvaled instanceof Event)
+                        eventManager.addEvent(eventTriggerEvaled, eventEvaled);
                 }
             }
         }
