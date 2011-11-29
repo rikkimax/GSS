@@ -142,8 +142,6 @@ class PlainServerConnection extends ServerConnection {
         socketConnector.getSessionConfig().setReadBufferSize(2048);
         socketConnector.getFilterChain().addLast("codec",
                 new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
-        socketConnector.getFilterChain().addLast("codec",
-                new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
         if (ioHandler != null)
             socketConnector.setHandler(ioHandler);
         Thread.start {
@@ -184,6 +182,9 @@ class PlainServerConnection extends ServerConnection {
      */
     synchronized void sendMessage(Object message) {
         if (session != null)
-            session.write(message);
+            if (message instanceof String)
+                session.write(message + "\r\n");
+            else
+                session.write(message);
     }
 }

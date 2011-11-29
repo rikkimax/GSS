@@ -61,7 +61,7 @@ abstract class PlainServerConnectionHandler extends IoHandlerAdapter {
         PlainServerConnectionMessage plainClient = new PlainServerConnectionMessage(server, message);
         messageToEvent = messageProcess(plainClient, message);
         if (messageToEvent != null)
-            loginNode.eventManager.trigger("received", plainClient, messageToEvent);
+            loginNode.eventManager.trigger("received", plainClient, session, messageToEvent);
     }
 
     abstract Object messageProcess(PlainServerConnectionMessage plainClient, Object message)
