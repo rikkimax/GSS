@@ -37,6 +37,8 @@ import org.apache.mina.core.RuntimeIoException
 import org.apache.commons.lang.StringUtils
 import org.apache.mina.filter.codec.ProtocolCodecFilter
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory
+import java.nio.charset.Charset
+import org.apache.mina.filter.codec.textline.TextLineCodecFactory
 
 /**
  * Provides a connection to a normal server.
@@ -64,14 +66,9 @@ class PlainServerConnection extends ServerConnection {
     private Long timeout = 30 * 1000L;
 
     /**
-     * Should we stop?
-     */
-    Boolean keepGoing;
-
-    /**
      * The session to the server.
      */
-    private IoSession session;
+    IoSession session;
 
     PlainServerConnection(LoginNode loginNode) {
         super(loginNode);
@@ -141,8 +138,10 @@ class PlainServerConnection extends ServerConnection {
      */
     synchronized void start() {
         socketConnector = new NioSocketConnector();
-        keepGoing = true;
         socketConnector.setConnectTimeoutMillis(timeout);
+        socketConnector.getSessionConfig().setReadBufferSize(2048);
+        socketConnector.getFilterChain().addLast("codec",
+                new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
         socketConnector.getFilterChain().addLast("codec",
                 new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
         if (ioHandler != null)
@@ -168,7 +167,7 @@ class PlainServerConnection extends ServerConnection {
      * Stop the connection
      */
     synchronized void stop() {
-        keepGoing = false;
+        session.close();
     }
 
     /**

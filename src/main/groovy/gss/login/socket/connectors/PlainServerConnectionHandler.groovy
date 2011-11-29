@@ -57,13 +57,10 @@ abstract class PlainServerConnectionHandler extends IoHandlerAdapter {
 
     @Override
     void messageReceived(IoSession session, Object message) {
-        Object messageToEvent = message;
-        Boolean eventThis = false;
+        Object messageToEvent;
         PlainServerConnectionMessage plainClient = new PlainServerConnectionMessage(server, message);
         messageToEvent = messageProcess(plainClient, message);
-        if (messageToEvent == null)
-            eventThis = false;
-        if (eventThis)
+        if (messageToEvent != null)
             loginNode.eventManager.trigger("received", plainClient, messageToEvent);
     }
 
