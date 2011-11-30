@@ -169,14 +169,15 @@ abstract class Booter {
             }
         }
         //set database server from config
-        database.getOther().keySet().each {
-            configH.put(it, database.getOther().get(it).toString().replace("{configDir}", config.getDirectory().getURL().toString()).replace("{workingDir}", workingDir.getAbsolutePath()));
-        }
+        if (database != null)
+            database?.getOther()?.keySet()?.each {
+                configH.put(it, database.getOther().get(it).toString().replace("{configDir}", config.getDirectory().getURL().toString()).replace("{workingDir}", workingDir.getAbsolutePath()));
+            }
         if (configH.get("hibernate.connection.url") != null) {
             //database url exists, otherwise we can't work...
             Logger.getLogger(Booter.class.getName()).info("Using database connection: " + configH.get("hibernate.connection.url"));
             configH.keySet().each {
-                config.getAnnotationConfiguration().setProperty(it, configH.get(it));
+                config.getAnnotationConfiguration().setProperty((String)it, "${configH.get(it)}");
             }
             sessionFactory = config.getAnnotationConfiguration().buildSessionFactory();
         } else
@@ -189,14 +190,26 @@ abstract class Booter {
     void startUpEventManager() {
         eventManager = new EventManagerHandler(this);
         config.getCommon().get("events", new HashMap()).each {eventTrigger, events ->
-            events.each {event ->
-                Object eventTriggerEvaled = Eval.me("return ${eventTrigger};");
-                Object eventEvaled = Eval.me("return new ${event}();");
-                if (eventTriggerEvaled != null && eventEvaled != null) {
-                    if (eventEvaled instanceof Event)
-                        eventManager.addEvent(eventTriggerEvaled, eventEvaled);
+            if (eventTrigger.startsWith("|"))
+                events.each {event ->
+                    Object eventTriggerEvaled = Eval.me("return ${eventTrigger.substring(1)};");
+                    Object eventEvaled = Eval.me("return new ${event}();");
+                    if (eventTriggerEvaled != null && eventEvaled != null) {
+                        if (eventEvaled instanceof Event)
+                            eventManager.addEvent(eventTriggerEvaled, eventEvaled);
+                    }
                 }
-            }
+            else
+                events.each {event ->
+                    Object eventTriggerEvaled = Eval.me("return ${eventTrigger};");
+                    String eventFile = ((String) event).replace(".", "/") + ".groovy";
+                    FileObject eventFileObject = (FileObject) workingDirFileObject;
+                    eventFile.split("/").each {
+                        eventFileObject?.resolveFile(it);
+                    }
+                    if (eventFileObject != null && eventTriggerEvaled != null)
+                        eventManager.addEvent(eventTrigger, eventFileObject);
+                }
         }
         // Convert any unused serialized classes to triggers or events, depending if it extends Event.
         config.getSerializedClasses().each {
@@ -225,11 +238,11 @@ abstract class Booter {
     void startUpQueueing() {
         queueManager = new QueueHandler(this);
         config.getCommon().get("queues", new HashMap()).each {key, value ->
-            Class clasz = Eval.me("return ${key}.class;");
-            Event event = null;
+            Class clasz = (Class) Eval.me("return ${key}.class;");
+            Object event = null;
             if (value != null)
                 event = Eval.me("return new ${value}();");
-            if (clasz != null && event != null)
+            if (clasz != null && event != null && event instanceof Event)
                 queueManager.addQueue(clasz, event);
             else if (clasz != null)
                 queueManager.addQueue(clasz);

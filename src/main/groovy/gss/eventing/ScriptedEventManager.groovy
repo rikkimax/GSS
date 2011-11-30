@@ -309,6 +309,7 @@ class ScriptedEventManager {
                     if (eventsObjects.get(eventFile) != null)
                         eventsObjects.get(eventFile).destroy("");
                     eventsObjects.remove(eventFile);
+                    System.gc();
                 }
             }
         }
@@ -325,6 +326,8 @@ class ScriptedEventManager {
             if (containsEventFile(fileObject)) {
                 cache.destroy("");
                 eventsObjects.remove(fileObject);
+                cache.finalize();
+                System.gc();
             }
         }
         // Trys to load some cache for a class...
