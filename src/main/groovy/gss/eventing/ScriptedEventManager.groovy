@@ -289,28 +289,34 @@ class ScriptedEventManager {
      */
     private void reloadCache() {
         gcl.clearCache();
+        ArrayList<FileObject> reloadedCache = new ArrayList<FileObject>();
         eventsFiles.each {key, eventsList ->
             eventsList.each {eventFile ->
                 boolean failed = true;
-                if (eventFile.exists()) {
-                    Object returned = gcl.parseClass(eventFile.content.inputStream);
-                    if (returned != null)
-                        if (returned instanceof Class) {
-                            Object returnedObject = returned.newInstance();
-                            if (returnedObject instanceof Event) {
-                                eventsObjects.put(eventFile, returnedObject);
-                                returnedObject.create(key, booter);
-                                failed = false;
-                                Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Loaded " + returnedObject.getClass().getName() + " into cache");
+                if (!reloadedCache.contains(eventFile)) {
+                    reloadedCache.add(eventFile);
+                    if (eventFile.exists()) {
+                        Object returned = gcl.parseClass(eventFile.content.inputStream);
+                        if (returned != null)
+                            if (returned instanceof Class) {
+                                Object returnedObject = returned.newInstance();
+                                if (returnedObject instanceof Event) {
+                                    eventsObjects.put(eventFile, returnedObject);
+                                    failed = false;
+                                    Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Loaded " + returnedObject.getClass().getName() + " into cache");
+                                }
                             }
-                        }
-                }
+                    }
+                } else
+                    failed = false;
                 if (failed) {
                     Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Failed to load " + eventFile + " into cache removing");
                     if (eventsObjects.get(eventFile) != null)
                         eventsObjects.get(eventFile).destroy("");
                     eventsObjects.remove(eventFile);
                     System.gc();
+                } else {
+                    eventsObjects?.get(eventFile)?.create(key, booter);
                 }
             }
         }
