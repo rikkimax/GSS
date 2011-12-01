@@ -177,7 +177,7 @@ abstract class Booter {
             //database url exists, otherwise we can't work...
             Logger.getLogger(Booter.class.getName()).info("Using database connection: " + configH.get("hibernate.connection.url"));
             configH.keySet().each {
-                config.getAnnotationConfiguration().setProperty((String)it, "${configH.get(it)}");
+                config.getAnnotationConfiguration().setProperty((String) it, "${configH.get(it)}");
             }
             sessionFactory = config.getAnnotationConfiguration().buildSessionFactory();
         } else
@@ -204,9 +204,13 @@ abstract class Booter {
                     Object eventTriggerEvaled = Eval.me("return ${eventTrigger};");
                     String eventFile = ((String) event).replace(".", "/") + ".groovy";
                     FileObject eventFileObject = (FileObject) workingDirFileObject;
-                    eventFile.split("/").each {
-                        eventFileObject?.resolveFile(it);
-                    }
+                    if (eventFile.contains("/"))
+                        eventFile.split("/").each {
+                            eventFileObject = eventFileObject?.resolveFile(it);
+                        }
+                    else
+                        eventFileObject = eventFileObject?.resolveFile(eventFile);
+                    println("Event to add[${eventTrigger}]:[${eventFileObject}]");
                     if (eventFileObject != null && eventTriggerEvaled != null)
                         eventManager.addEvent(eventTrigger, eventFileObject);
                 }
