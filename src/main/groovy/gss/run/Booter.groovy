@@ -202,7 +202,7 @@ abstract class Booter {
             else
                 events.each {event ->
                     Object eventTriggerEvaled = Eval.me("return ${eventTrigger};");
-                    String eventFile = ((String) event).replace(".", "/") + ".groovy";
+                    String eventFile = "events/" + ((String) event).replace(".", "/") + ".groovy";
                     FileObject eventFileObject = (FileObject) workingDirFileObject;
                     if (eventFile.contains("/"))
                         eventFile.split("/").each {
@@ -210,9 +210,8 @@ abstract class Booter {
                         }
                     else
                         eventFileObject = eventFileObject?.resolveFile(eventFile);
-                    println("Event to add[${eventTrigger}]:[${eventFileObject}]");
                     if (eventFileObject != null && eventTriggerEvaled != null)
-                        eventManager.addEvent(eventTrigger, eventFileObject);
+                        eventManager.addEvent(eventTriggerEvaled, eventFileObject);
                 }
         }
         // Convert any unused serialized classes to triggers or events, depending if it extends Event.

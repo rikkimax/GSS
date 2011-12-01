@@ -134,7 +134,7 @@ class Config {
                 kryo.register(clasz);
                 Logger.getLogger(this.getClass().getName()).info("Adding class " + clasz + " to annotated list");
                 annotationConfiguration.addAnnotatedClass(clasz);
-                ogmConfiguration.addAnnotatedClass(clasz);
+                //ogmConfiguration.addAnnotatedClass(clasz);
             }
         }
     }

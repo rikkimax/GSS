@@ -197,7 +197,7 @@ class ScriptedEventManager {
             // Lets add this file to be checked for...
             // No idea if its actually an event or not lol
             getFiles(key).add(fileObject);
-            if (fileObject.exists()) {
+            if (!fileObject.exists()) {
                 fileMonitor.addFile(fileObject);
                 loadClassCache(fileObject);
             }
