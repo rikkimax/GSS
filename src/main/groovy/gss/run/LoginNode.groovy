@@ -101,7 +101,7 @@ class LoginNode extends Booter {
         }
         HashMap<ArrayList<HashMap<Object, Object>>> serversConfig = current.other?.get("servers");
         for (String serverClass: serversConfig?.keySet()) {
-            ArrayList<HashMap<Object, Object>> values = serversConfig.get(serverClass);
+            List<Map<Object, Object>> values = serversConfig.get(serverClass);
             Class serverClassReflected = Eval.me("return " + serverClass + ".class");
             if (serverClassReflected != null) {
                 Object serverClassObject = Eval.x(this, "return new " + serverClass + "(x);");

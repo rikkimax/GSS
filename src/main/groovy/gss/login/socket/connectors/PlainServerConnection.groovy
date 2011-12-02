@@ -36,9 +36,9 @@ import org.apache.mina.core.future.ConnectFuture
 import org.apache.mina.core.RuntimeIoException
 import org.apache.commons.lang.StringUtils
 import org.apache.mina.filter.codec.ProtocolCodecFilter
-import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory
 import java.nio.charset.Charset
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Provides a connection to a normal server.
@@ -48,22 +48,24 @@ class PlainServerConnection extends ServerConnection {
     /**
      * Is the ID of the client a simple one?
      */
-    private String id;
+    protected String id;
 
     /**
      * The server socket.
      */
-    private NioSocketConnector socketConnector;
+    protected NioSocketConnector socketConnector;
 
     /**
      * Handles data from client.
      */
-    private IoHandlerAdapter ioHandler;
+    protected IoHandlerAdapter ioHandler;
 
     /**
      * Time out of the connection.
      */
-    private Long timeout = 30 * 1000L;
+    protected Long timeout = 30 * 1000L;
+
+    protected ConcurrentHashMap<Object, Object> otherSettings = new ConcurrentHashMap<Object, Object>();
 
     /**
      * The session to the server.
@@ -127,6 +129,7 @@ class PlainServerConnection extends ServerConnection {
                 if (result instanceof PlainServerConnectionHandler)
                     ioHandler = result;
         }
+        otherSettings = new ConcurrentHashMap((Map)values);
         if (values.get("timeout") != null)
             timeout = new Long(values.get("timeout").toString());
         if (tcp == null || port == null)
@@ -186,5 +189,9 @@ class PlainServerConnection extends ServerConnection {
                 session.write(message + "\r\n");
             else
                 session.write(message);
+    }
+
+    synchronized ConcurrentHashMap<Object, Object> getOtherSettings() {
+        return otherSettings;
     }
 }

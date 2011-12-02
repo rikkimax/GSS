@@ -69,7 +69,7 @@ class QueueHandler {
             while (booter.getKeepGoing()) {
                 // Do we have spare slots?
                 //      If so check for a new items on the queue that does
-                if (Runtime.getRuntime().freeMemory() >= minMemory) {
+                if (Runtime.getRuntime().freeMemory() >= minMemory && queueManagers.size() > 0) {
                     if (queueManagers.size() > lastQueueExecuted)
                         lastQueueExecuted++;
                     else
@@ -80,7 +80,7 @@ class QueueHandler {
                         if (queueManager.event != null)
                             queueManager.event.run(queuedItem.getClass().getCanonicalName(), queueManager, queuedItem);
                         else
-                            booter.eventManager.trigger(queuedItem, queueManager, queuedItem);
+                            booter.eventManager.trigger(queuedItem.getClass().getCanonicalName(), queueManager, queuedItem);
                     }
                 }
                 Runtime.getRuntime().gc();

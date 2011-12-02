@@ -71,7 +71,10 @@ class QueueManager<T> {
             T.metaClass."setRead" = {Boolean read -> this.read = read;};
             T.metaClass."getRead" = {-> return read;};
         }
-        event.create(T.getClass().getCanonicalName(), booter);
+        if (event != null)
+            event.create(T.getClass().getCanonicalName(), booter);
+        else
+            booter.getEventManager().trigger(T.getClass().getCanonicalName(), booter);
     }
 
     /**
