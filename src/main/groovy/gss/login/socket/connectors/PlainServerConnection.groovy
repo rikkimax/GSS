@@ -129,7 +129,7 @@ class PlainServerConnection extends ServerConnection {
                 if (result instanceof PlainServerConnectionHandler)
                     ioHandler = result;
         }
-        otherSettings = new ConcurrentHashMap((Map)values);
+        otherSettings = new ConcurrentHashMap((Map) values);
         if (values.get("timeout") != null)
             timeout = new Long(values.get("timeout").toString());
         if (tcp == null || port == null)
@@ -168,7 +168,8 @@ class PlainServerConnection extends ServerConnection {
      * Stop the connection
      */
     synchronized void stop() {
-        session.close();
+        if (session != null)
+            session.close();
     }
 
     /**

@@ -55,7 +55,7 @@ class ServerConnections {
      */
     void removeSocket(ServerConnection serverSocket) {
         sockets.remove(serverSocket);
-        serverSocket.stop();
+        serverSocket?.stop();
     }
 
     /**
