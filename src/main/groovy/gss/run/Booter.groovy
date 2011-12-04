@@ -316,4 +316,12 @@ abstract class Booter {
     synchronized Boolean getKeepGoing() {
         return keepGoingStartUp;
     }
+    
+    /**
+     * Get the queue manager created and managed.
+     * @return The queue manager.
+     */
+    synchronized QueueHandler getQueueHandler() {
+        return queueManager;
+    }
 }
