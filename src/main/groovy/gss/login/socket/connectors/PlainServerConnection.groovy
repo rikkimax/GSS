@@ -65,6 +65,9 @@ class PlainServerConnection extends ServerConnection {
      */
     protected Long timeout = 30 * 1000L;
 
+    /**
+     *  Other settings set to the connection.
+     */
     protected ConcurrentHashMap<Object, Object> otherSettings = new ConcurrentHashMap<Object, Object>();
 
     /**
@@ -150,17 +153,20 @@ class PlainServerConnection extends ServerConnection {
         Thread.start {
             for (;;) {
                 try {
-                    ConnectFuture future = socketConnector.connect(new InetSocketAddress(server, port));
-                    future.awaitUninterruptibly();
-                    session = future.getSession();
-                    break;
+                    if (server != null && port != null) {
+                        ConnectFuture future = socketConnector.connect(new InetSocketAddress(server, port));
+                        future.awaitUninterruptibly();
+                        session = future.getSession();
+                        break;
+                    } else {
+                        Thread.sleep(5000);
+                    }
                 } catch (RuntimeIoException e) {
                     e.printStackTrace();
                     Thread.sleep(5000);
                 }
             }
             session?.getCloseFuture()?.awaitUninterruptibly();
-            socketConnector.dispose();
         }
     }
 
