@@ -83,8 +83,9 @@ class QueueManager<T> {
             List ret = criteria.list();
             session.close();
             if (ret.size() > 0) {
-                mark((T) ret.get(0));
-                return (T) ret.get(0);
+                T retV = (T) ret.get(0);
+                mark(retV);
+                return retV;
             }
         }
         return null;
@@ -98,7 +99,7 @@ class QueueManager<T> {
         Session session = booter.getSession();
         if (session != null) {
             Transaction transaction = session.beginTransaction();
-            session.save(object);
+            session.saveOrUpdate(object);
             transaction.commit();
         }
     }

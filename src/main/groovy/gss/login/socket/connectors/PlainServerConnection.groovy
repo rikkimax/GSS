@@ -152,14 +152,17 @@ class PlainServerConnection extends ServerConnection {
                     if (server != null && port != null) {
                         ConnectFuture future = socketConnector.connect(new InetSocketAddress(server, port));
                         future.awaitUninterruptibly();
+                        session = future.getSession();
+                        while (session?.isConnected()) {
+                        }
                         future.getSession().getCloseFuture().awaitUninterruptibly();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 socketConnector.dispose();
+                session = null;
             }
-            session = null;
         }
     }
 
