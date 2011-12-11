@@ -29,16 +29,15 @@ package gss.login.socket.connectors
 
 import gss.login.socket.ServerConnection
 import gss.run.LoginNode
-import org.apache.mina.core.service.IoHandlerAdapter
-import org.apache.mina.transport.socket.nio.NioSocketConnector
-import org.apache.mina.core.session.IoSession
-import org.apache.mina.core.future.ConnectFuture
-import org.apache.mina.core.RuntimeIoException
-import org.apache.commons.lang.StringUtils
-import org.apache.mina.filter.codec.ProtocolCodecFilter
 import java.nio.charset.Charset
-import org.apache.mina.filter.codec.textline.TextLineCodecFactory
 import java.util.concurrent.ConcurrentHashMap
+import org.apache.commons.lang.StringUtils
+import org.apache.mina.core.future.ConnectFuture
+import org.apache.mina.core.service.IoHandlerAdapter
+import org.apache.mina.core.session.IoSession
+import org.apache.mina.filter.codec.ProtocolCodecFilter
+import org.apache.mina.filter.codec.textline.TextLineCodecFactory
+import org.apache.mina.transport.socket.nio.NioSocketConnector
 
 /**
  * Provides a connection to a normal server.
@@ -70,7 +69,7 @@ class PlainServerConnection extends ServerConnection {
     /**
      * The session to the server.
      */
-    IoSession session;
+    IoSession session = null;
 
     PlainServerConnection(LoginNode loginNode) {
         super(loginNode);
@@ -140,27 +139,27 @@ class PlainServerConnection extends ServerConnection {
      * Start the connection
      */
     synchronized void start() {
-        socketConnector = new NioSocketConnector();
-        socketConnector.setConnectTimeoutMillis(timeout);
-        socketConnector.getSessionConfig().setReadBufferSize(2048);
-        socketConnector.getFilterChain().addLast("codec",
-                new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
-        if (ioHandler != null)
-            socketConnector.setHandler(ioHandler);
-        Thread.start {
-            for (;;) {
+        if (session == null) {
+            socketConnector = new NioSocketConnector();
+            socketConnector.setConnectTimeoutMillis(timeout);
+            socketConnector.getSessionConfig().setReadBufferSize(2048);
+            socketConnector.getFilterChain().addLast("codec",
+                    new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
+            if (ioHandler != null)
+                socketConnector.setHandler(ioHandler);
+            Thread.start {
                 try {
-                    ConnectFuture future = socketConnector.connect(new InetSocketAddress(server, port));
-                    future.awaitUninterruptibly();
-                    session = future.getSession();
-                    break;
-                } catch (RuntimeIoException e) {
+                    if (server != null && port != null) {
+                        ConnectFuture future = socketConnector.connect(new InetSocketAddress(server, port));
+                        future.awaitUninterruptibly();
+                        future.getSession().getCloseFuture().awaitUninterruptibly();
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
-                    Thread.sleep(5000);
                 }
+                socketConnector.dispose();
             }
-            session?.getCloseFuture()?.awaitUninterruptibly();
-            socketConnector.dispose();
+            session = null;
         }
     }
 

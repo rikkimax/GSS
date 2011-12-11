@@ -171,7 +171,7 @@ abstract class Booter {
         //set database server from config
         if (database != null)
             database?.getOther()?.keySet()?.each {
-                configH.put(it, database.getOther().get(it).toString().replace("{configDir}", config.getDirectory().getURL().toString()).replace("{workingDir}", workingDir.getAbsolutePath()));
+                configH.put(it, database.getOther().get(it).toString().replace("{configDir}", config.getDirectory().getURL().toString().replace("\\", "/")).replace("{workingDir}", workingDir.getAbsolutePath().replace("\\", "/")));
             }
         if (configH.get("hibernate.connection.url") != null) {
             //database url exists, otherwise we can't work...
@@ -274,7 +274,7 @@ abstract class Booter {
      */
     synchronized Session getSession() {
         //give us a new session that is opened so we can work with the database
-        return sessionFactory.openSession();
+        return sessionFactory?.getCurrentSession();
     }
 
     /**

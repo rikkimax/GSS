@@ -70,7 +70,7 @@ class QueueHandler {
                 // Do we have spare slots?
                 //      If so check for a new items on the queue that does
                 if (Runtime.getRuntime().freeMemory() >= minMemory && queueManagers.size() > 0) {
-                    if (queueManagers.size() > lastQueueExecuted)
+                    if (queueManagers.size() > lastQueueExecuted + 1)
                         lastQueueExecuted++;
                     else
                         lastQueueExecuted = 0;
@@ -101,7 +101,7 @@ class QueueHandler {
      * @param event Primary event to use.
      */
     synchronized void addQueue(Class clasz, Event event) {
-        QueueManager queueManager = (QueueManager) Eval.xy(booter, event, "return new gss.queueing.QueueManager<${clasz.getCanonicalName()}>(x, y);");
+        QueueManager queueManager = (QueueManager) Eval.xyz(clasz, booter, event, "return new gss.queueing.QueueManager<${clasz.getCanonicalName()}>(x, y, z);");
         if (queueManager != null) {
             Boolean dont = false;
             queueManagers.each {

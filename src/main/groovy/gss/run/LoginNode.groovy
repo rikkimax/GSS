@@ -27,21 +27,12 @@
 
 package gss.run
 
-import gss.config.Config
 import gss.config.Server
-import java.util.logging.Level
-import java.util.logging.Logger
-import javax.persistence.EntityManager
-import joptsimple.OptionParser
-import joptsimple.OptionSet
-import org.hibernate.SessionFactory
-import org.hibernate.Session
-import gss.login.socket.ServerSocket
-import gss.login.Servers
-import gss.queueing.TestQueue
-import gss.queueing.QueueManager
-import gss.login.socket.ServerConnection
 import gss.login.ServerConnections
+import gss.login.Servers
+import gss.login.socket.ServerConnection
+import gss.login.socket.ServerSocket
+import java.util.logging.Logger
 
 /**
  * This is a booter class, it will start every thing up for the login node.
@@ -81,14 +72,19 @@ class LoginNode extends Booter {
     @Override
     void startup() {
         super.startup();
-        if (keepGoingStartUp)
-            startUpServers();
+        Thread.start {
+            sleep(2000);
+            Logger.getLogger(this.getClass().getCanonicalName()).info("Should have finished booting of core stuff..."
+                    + "now for the non core");
+            if (keepGoingStartUp)
+                startUpServers();
+        }
     }
 
     /**
      * Starts up server connectors from configuration.
      */
-    void startUpServers() {
+    synchronized void startUpServers() {
         //find current server details from config
         servers = new Servers();
         serverConnections = new ServerConnections();

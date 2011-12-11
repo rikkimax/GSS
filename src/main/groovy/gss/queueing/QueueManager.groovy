@@ -27,12 +27,13 @@
 
 package gss.queueing
 
+import gss.eventing.Event
 import gss.run.Booter
-import org.hibernate.Session
 import org.hibernate.Criteria
+import org.hibernate.Session
+import org.hibernate.Transaction
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
-import gss.eventing.Event
 
 /**
  * The point of this class is to provide an easy manager of queues
@@ -46,7 +47,7 @@ class QueueManager<T> {
     /**
      * The class we are working with.
      */
-    private final Class clasz = T;
+    private Class clasz;
 
     /**
      * Primary event (overides event system).
@@ -57,22 +58,12 @@ class QueueManager<T> {
      * Initiation method.
      * @param booter The booter that created this instance.
      */
-    QueueManager(Booter booter, Event event) {
+    QueueManager(Class clasz, Booter booter, Event event) {
         this.booter = booter;
         this.event = event;
-        Boolean readHas = false;
-        T.metaClass.getMethods().each {
-            if (it.getName() == "setRead") {
-                readHas = true;
-            }
-        }
-        if (!readHas) {
-            T.metaClass.read = false;
-            T.metaClass."setRead" = {Boolean read -> this.read = read;};
-            T.metaClass."getRead" = {-> return read;};
-        }
+        this.clasz = clasz;
         if (event != null)
-            event.create(T.getClass().getCanonicalName(), booter);
+            event.create(clasz.getCanonicalName(), booter);
         else
             booter.getEventManager().trigger(T.getClass().getCanonicalName(), booter);
     }
@@ -83,16 +74,18 @@ class QueueManager<T> {
      */
     synchronized T getLast() {
         Session session = booter.getSession();
-        session.beginTransaction();
-        Criteria criteria = session.createCriteria(T);
-        criteria.add(Restrictions.eq("read", false));
-        criteria.addOrder(Order.desc("created"));
-        criteria.setMaxResults(1);
-        List ret = criteria.list();
-        session.close();
-        if (ret.size() > 0) {
-            mark((T) ret.get(0));
-            return (T) ret.get(0);
+        if (session != null) {
+            session.beginTransaction();
+            Criteria criteria = session.createCriteria(clasz);
+            criteria.add(Restrictions.eq("read", false));
+            criteria.addOrder(Order.desc("created"));
+            criteria.setMaxResults(1);
+            List ret = criteria.list();
+            session.close();
+            if (ret.size() > 0) {
+                mark((T) ret.get(0));
+                return (T) ret.get(0);
+            }
         }
         return null;
     }
@@ -103,9 +96,11 @@ class QueueManager<T> {
      */
     synchronized void save(T object) {
         Session session = booter.getSession();
-        session.beginTransaction();
-        session.save(object);
-        session.close();
+        if (session != null) {
+            Transaction transaction = session.beginTransaction();
+            session.save(object);
+            transaction.commit();
+        }
     }
 
     /**
@@ -114,9 +109,11 @@ class QueueManager<T> {
      */
     synchronized void delete(T object) {
         Session session = booter.getSession();
-        session.beginTransaction();
-        session.delete(object);
-        session.close();
+        if (session != null) {
+            Transaction transaction = session.beginTransaction();
+            session.delete(object);
+            transaction.commit();
+        }
     }
 
     /**
@@ -142,6 +139,6 @@ class QueueManager<T> {
      * @return Class we are using.
      */
     synchronized Class<T> getClassUsed() {
-        return T;
+        return clasz;
     }
 }
