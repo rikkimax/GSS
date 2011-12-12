@@ -90,4 +90,12 @@ class PlainServerConnectionMessage extends ServerConnectionMessage {
     synchronized Object getMessage() {
         return message;
     }
+
+    /**
+     * Get the server that received this message.
+     * @return The server that received this message.
+     */
+    synchronized PlainServerConnection getServer() {
+        return (PlainServerConnection)serverConnection;
+    }
 }

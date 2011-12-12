@@ -103,14 +103,14 @@ class LoginNode extends Booter {
                 Object serverClassObject = Eval.x(this, "return new " + serverClass + "(x);");
                 if (serverClassObject instanceof ServerSocket) {
                     for (HashMap<Object> serverValue: values) {
-                        ServerSocket serverConnector = serverClassObject;
+                        ServerSocket serverConnector = (ServerSocket)Eval.x(this, "return new " + serverClass + "(x);");
                         serverConnector.setValues(serverValue);
                         servers.addSocket(serverConnector);
                         Logger.getLogger(this.getClass().getCanonicalName()).info("Added server socket ${serverConnector}");
                     }
                 } else if (serverClassObject instanceof ServerConnection) {
                     for (HashMap<Object> serverValue: values) {
-                        ServerConnection serverConnector = serverClassObject;
+                        ServerConnection serverConnector = (ServerConnection)Eval.x(this, "return new " + serverClass + "(x);");
                         serverConnector.setValues(serverValue);
                         serverConnections.addSocket(serverConnector);
                         Logger.getLogger(this.getClass().getCanonicalName()).info("Added server connection socket ${serverConnector}");
