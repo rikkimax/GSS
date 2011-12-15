@@ -353,8 +353,8 @@ class ScriptedEventManager {
         eventsFiles.each {key, eventsList ->
             eventsList.each {eventFile ->
                 boolean failed = true;
-                if (eventFile.exists())
-                    if (eventFile.getURL() == fileObject.getURL()) {
+                if (eventFile.getURL() == fileObject.getURL()) {
+                    if (eventFile.exists()) {
                         Object returned = gcl.parseClass(eventFile.content.inputStream);
                         if (returned != null)
                             if (returned instanceof Class) {
@@ -367,11 +367,12 @@ class ScriptedEventManager {
                                 }
                             }
                     }
-                if (failed) {
-                    Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Failed to load " + eventFile + " into cache removing");
-                    if (eventsObjects.get(eventFile) != null)
-                        eventsObjects.get(eventFile).destroy("");
-                    eventsObjects.remove(eventFile);
+                    if (failed) {
+                        Logger.getLogger(ScriptedEventManager.getClass().getName()).info("Failed to load " + eventFile + " into cache removing");
+                        if (eventsObjects.get(eventFile) != null)
+                            eventsObjects.get(eventFile).destroy("");
+                        eventsObjects.remove(eventFile);
+                    }
                 }
             }
         }
