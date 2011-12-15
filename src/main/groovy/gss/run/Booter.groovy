@@ -233,7 +233,6 @@ abstract class Booter {
                 eventManager.addEvent(it, new UnknownEvent());
         }
         def runNextDir = {FileObject parent, FileObject top, runNextDir ->
-            println(parent.getURL());
             if (parent.getType() == FileType.FILE) {
                 if (parent.getName().getExtension() == "groovy") {
                     String packge = parent.getURL().toString().substring(top.getURL().toString().length() + 1);
