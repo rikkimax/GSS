@@ -276,7 +276,10 @@ abstract class Booter {
      */
     synchronized Session getSession() {
         //give us a new session that is opened so we can work with the database
-        return sessionFactory?.getCurrentSession();
+        if (sessionFactory?.getCurrentSession() != null)
+            return sessionFactory?.getCurrentSession();
+        else
+            return sessionFactory?.openSession();
     }
 
     /**
