@@ -154,6 +154,8 @@ abstract class Booter {
             startUpQueueing();
         if (keepGoingStartUp)
             startUpDataBase();
+        if (keepGoingStartUp)
+            eventManager.trigger("started", this);
     }
 
     /**
@@ -316,7 +318,7 @@ abstract class Booter {
     synchronized Boolean getKeepGoing() {
         return keepGoingStartUp;
     }
-    
+
     /**
      * Get the queue manager created and managed.
      * @return The queue manager.
