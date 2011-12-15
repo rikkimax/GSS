@@ -28,10 +28,9 @@
 package gss.config
 
 import gss.run.Booter
-import org.apache.commons.vfs.FileObject
 import java.util.concurrent.ConcurrentHashMap
+import org.apache.commons.vfs.FileObject
 import org.apache.commons.vfs.FileType
-import org.apache.commons.vfs.provider.local.LocalFile
 
 /**
  * The point of this class is to allow scripted classes to load at boot time.
@@ -82,6 +81,14 @@ class ScriptedBootLoader {
      * Load the classes into cache from file.
      */
     protected void load() {
+        // Common shared code...
+        if (directory.parent.resolveFile("boot_code").exists())
+            load(directory.parent.resolveFile("boot_code"));
+        if (directory.parent.parent.resolveFile("boot_code").exists())
+            load(directory.parent.parent.resolveFile("boot_code"));
+        if (directory.parent.parent.parent.resolveFile("boot_code").exists())
+            load(directory.parent.parent.parent.resolveFile("boot_code"));
+        // The nodes code...
         load(directory);
     }
 

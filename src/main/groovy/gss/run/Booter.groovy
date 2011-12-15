@@ -27,22 +27,23 @@
 
 package gss.run
 
-import joptsimple.OptionParser
-import joptsimple.OptionSet
 import gss.config.Config
+import gss.config.ScriptedBootLoader
+import gss.config.Server
+import gss.eventing.Event
+import gss.eventing.EventManagerHandler
+import gss.eventing.UnknownEvent
+import gss.queueing.QueueHandler
 import java.util.logging.Level
 import java.util.logging.Logger
-import gss.config.Server
-import org.hibernate.SessionFactory
 import javax.persistence.EntityManager
-import org.hibernate.Session
+import joptsimple.OptionParser
+import joptsimple.OptionSet
 import org.apache.commons.vfs.FileObject
-import gss.eventing.Event
-import gss.eventing.UnknownEvent
+import org.apache.commons.vfs.FileType
 import org.apache.commons.vfs.VFS
-import gss.eventing.EventManagerHandler
-import gss.config.ScriptedBootLoader
-import gss.queueing.QueueHandler
+import org.hibernate.Session
+import org.hibernate.SessionFactory
 
 /**
  * The point of this class is to provide a generic booter to be extended.
@@ -231,6 +232,28 @@ abstract class Booter {
             if (toTrigger)
                 eventManager.addEvent(it, new UnknownEvent());
         }
+        def runNextDir = {FileObject parent, FileObject top, runNextDir ->
+            println(parent.getURL());
+            if (parent.getType() == FileType.FILE) {
+                if (parent.getName().getExtension() == "groovy") {
+                    String packge = parent.getURL().toString().substring(top.getURL().toString().length() + 1);
+                    packge = packge.replace("/", ".").replace(".groovy", "");
+                    Boolean result = (Boolean)Eval.me("if (gss.eventing.Event.class.isAssignableFrom(${packge}.class)) return true; else return false;");
+                    if (result)
+                        eventManager.addEvent(UnknownEvent.class, (Event)Eval.me("return new ${packge}();"));
+                }
+            } else if (parent.getType() == FileType.FOLDER) {
+                parent.children.each {
+                    runNextDir(it, top, runNextDir);
+                }
+            }
+        }
+        FileObject usedDir = config.getDirectory().resolveFile("boot_code");
+        runNextDir(usedDir, usedDir, runNextDir);
+        if (usedDir.parent.parent.exists())
+            runNextDir(usedDir.parent.parent.resolveFile("boot_code"), usedDir.parent.parent.parent.resolveFile("boot_code"), runNextDir);
+        if (usedDir.parent.parent.parent.exists())
+            runNextDir(usedDir.parent.parent.parent.resolveFile("boot_code"), usedDir.parent.parent.parent.resolveFile("boot_code"), runNextDir);
         FileObject eventsDir = workingDirFileObject.resolveFile("events");
         if (!eventsDir.exists())
             eventsDir.createFolder();
