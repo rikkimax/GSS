@@ -69,7 +69,7 @@ class EventManagerHandler {
     EventManagerHandler(Booter booter) {
         this.booter = booter;
         scriptedEventManager = new ScriptedEventManager(booter);
-        eventManager = new EventManager();
+        eventManager = new EventManager(booter);
         /**
          * Listen for when file changes occur.
          */
