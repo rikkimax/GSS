@@ -234,7 +234,7 @@ abstract class Booter {
             if (toTrigger)
                 eventManager.addEvent(it, new UnknownEvent());
         }
-        def runNextDir = {FileObject parent, FileObject top, runNextDir ->
+        def runNextDir = {FileObject parent, FileObject top, EventManagerHandler eventManager, runNextDir ->
             if (parent.getType() == FileType.FILE) {
                 if (parent.getName().getExtension() == "groovy") {
                     String packge = parent.getURL().toString().substring(top.getURL().toString().length() + 1);
@@ -245,16 +245,16 @@ abstract class Booter {
                 }
             } else if (parent.getType() == FileType.FOLDER) {
                 parent.children.each {
-                    runNextDir(it, top, runNextDir);
+                    runNextDir(it, top, eventManager, runNextDir);
                 }
             }
         }
         FileObject usedDir = config.getDirectory().resolveFile("boot_code");
-        runNextDir(usedDir, usedDir, runNextDir);
+        runNextDir(usedDir, usedDir, eventManager, runNextDir);
         if (usedDir.parent.parent.exists())
-            runNextDir(usedDir.parent.parent.resolveFile("boot_code"), usedDir.parent.parent.parent.resolveFile("boot_code"), runNextDir);
+            runNextDir(usedDir.parent.parent.resolveFile("boot_code"), usedDir.parent.parent.parent.resolveFile("boot_code"), eventManager, runNextDir);
         if (usedDir.parent.parent.parent.exists())
-            runNextDir(usedDir.parent.parent.parent.resolveFile("boot_code"), usedDir.parent.parent.parent.resolveFile("boot_code"), runNextDir);
+            runNextDir(usedDir.parent.parent.parent.resolveFile("boot_code"), usedDir.parent.parent.parent.resolveFile("boot_code"), eventManager, runNextDir);
         FileObject eventsDir = workingDirFileObject.resolveFile("events");
         if (!eventsDir.exists())
             eventsDir.createFolder();
