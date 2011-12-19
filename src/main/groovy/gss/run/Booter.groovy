@@ -156,7 +156,9 @@ abstract class Booter {
         if (keepGoingStartUp)
             startUpDataBase();
         if (keepGoingStartUp)
-            eventManager.trigger("started", this);
+            Thread.start {
+                eventManager.trigger("started", this);
+            }
     }
 
     /**
@@ -237,9 +239,9 @@ abstract class Booter {
                 if (parent.getName().getExtension() == "groovy") {
                     String packge = parent.getURL().toString().substring(top.getURL().toString().length() + 1);
                     packge = packge.replace("/", ".").replace(".groovy", "");
-                    Boolean result = (Boolean)Eval.me("if (gss.eventing.Event.class.isAssignableFrom(${packge}.class)) return true; else return false;");
+                    Boolean result = (Boolean) Eval.me("if (gss.eventing.Event.class.isAssignableFrom(${packge}.class)) return true; else return false;");
                     if (result)
-                        eventManager.addEvent(UnknownEvent.class, (Event)Eval.me("return new ${packge}();"));
+                        eventManager.addEvent(UnknownEvent.class, (Event) Eval.me("return new ${packge}();"));
                 }
             } else if (parent.getType() == FileType.FOLDER) {
                 parent.children.each {
