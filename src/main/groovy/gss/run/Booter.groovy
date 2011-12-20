@@ -150,11 +150,11 @@ abstract class Booter {
      */
     void startup() {
         if (keepGoingStartUp)
+            startUpDataBase();
+        if (keepGoingStartUp)
             startUpEventManager();
         if (keepGoingStartUp)
             startUpQueueing();
-        if (keepGoingStartUp)
-            startUpDataBase();
         if (keepGoingStartUp)
             Thread.start {
                 eventManager.trigger("started", this);
