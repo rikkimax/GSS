@@ -417,8 +417,10 @@ class EventManagerHandler {
      * @param pass Anything required to pass to the events.
      */
     void trigger(String key, Object context, Object... pass) {
-        scriptedEventManager.trigger(key, context, pass);
-        eventManager.trigger(key, context, pass);
+        Thread.start {
+            scriptedEventManager.trigger(key, context, pass);
+            eventManager.trigger(key, context, pass);
+        };
     }
 
     /**
