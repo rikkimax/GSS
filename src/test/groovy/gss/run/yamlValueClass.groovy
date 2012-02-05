@@ -29,7 +29,7 @@ import org.yaml.snakeyaml.Yaml
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-//a very simple test to see if classes can be yaml loaded and dumped
+//a very gss.simple test to see if classes can be yaml loaded and dumped
 class Val {
     String test;
 }

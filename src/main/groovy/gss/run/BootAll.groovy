@@ -143,6 +143,7 @@ class BootAll {
     private static void parseArgumentsNodes(OptionParser optionParser, OptionSet optionSet, File configDir, File workingDir, Boolean uniqueDirs) {
         Map<String, Integer> countUsed = new HashMap<String, Integer>();
         countUsed.put("login", 0);
+        countUsed.put("processing", 0);
         optionSet.nonOptionArguments().each {
             String type = it.toLowerCase();
             String extension = "";

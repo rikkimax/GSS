@@ -40,11 +40,11 @@ import org.apache.mina.core.session.IdleStatus
 import java.util.logging.Logger
 
 /**
- * The point of this class is to provide a simple NIO server.
+ * The point of this class is to provide a gss.simple NIO server.
  */
 class PlainServer extends ServerSocket {
     /**
-     * Is the ID of the client a simple one?
+     * Is the ID of the client a gss.simple one?
      */
     private Boolean simpleID;
 
@@ -155,7 +155,7 @@ class PlainServer extends ServerSocket {
     }
 
     /**
-     * Are we going to be using a simple id for clients?
+     * Are we going to be using a gss.simple id for clients?
      * @return Are we?
      */
     synchronized Boolean getSimpleID() {

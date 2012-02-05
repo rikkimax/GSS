@@ -54,6 +54,11 @@ class QueueHandler {
     private int lastQueueExecuted = -1;
 
     /**
+     * The maximun age for an item.
+     */
+    private int maxAge = -1;
+
+    /**
      * Initiation method.
      * @param booter The booter that created this instance.
      */
@@ -76,11 +81,17 @@ class QueueHandler {
                         lastQueueExecuted = 0;
                     if (queueManagers.size() > 0) {
                         QueueManager queueManager = queueManagers.get(lastQueueExecuted);
+                        //check for the last item added and event it.
                         Object queuedItem = queueManager.getLast();
                         if (queueManager.event != null)
                             queueManager.event.run(queuedItem.getClass().getCanonicalName(), queueManager, queuedItem);
                         else
                             booter.eventManager.trigger(queuedItem.getClass().getCanonicalName(), queueManager, queuedItem);
+                        // if we are monitoring age of items get the oldest and if older delete it.
+                        if (maxAge > 0) {
+                            queuedItem = queueManager.getOldest();
+                            Eval.xyz(queuedItem, maxAge, queueManager, "if (x.created >= y) z.delete(x);");
+                        }
                     }
                 }
                 Runtime.getRuntime().gc();
@@ -105,7 +116,7 @@ class QueueHandler {
         if (queueManager != null) {
             Boolean dont = false;
             queueManagers.each {
-                if (it.getClass() != clasz)
+                if (it.getClass() == clasz)
                     dont = true;
             }
             if (!dont)
@@ -122,5 +133,21 @@ class QueueHandler {
             if (it.getClass() == clasz)
                 queueManagers.remove(it);
         }
+    }
+
+    /**
+     * Get the max age of an item can be.
+     * @return The max age of an item can be.
+     */
+    int getMaximumAge() {
+        return maxAge;
+    }
+
+    /**
+     * Set the maximum age of an item can be or -1 for disabled.
+     * @param age The maximum age of an item can be.
+     */
+    synchronized setMaximumAge(int age) {
+        maxAge = age;
     }
 }

@@ -40,7 +40,7 @@ import gss.run.Booter
 class KryoNetServer extends ServerSocket {
 
     /**
-     * Is the ID of the client a simple one?
+     * Is the ID of the client a gss.simple one?
      */
     private Boolean simpleID;
     /**
@@ -101,8 +101,8 @@ class KryoNetServer extends ServerSocket {
     }
 
     /**
-     * Is the client ID simple?
-     * @return If the client ID is simple.
+     * Is the client ID gss.simple?
+     * @return If the client ID is gss.simple.
      */
     Boolean isSimpleID() {
         return simpleID;

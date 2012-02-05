@@ -45,7 +45,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector
 class PlainServerConnection extends ServerConnection {
 
     /**
-     * Is the ID of the client a simple one?
+     * Is the ID of the client a gss.simple one?
      */
     protected String id;
 

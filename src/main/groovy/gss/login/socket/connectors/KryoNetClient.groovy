@@ -37,7 +37,7 @@ import org.apache.commons.lang.StringUtils
  */
 class KryoNetClient extends SocketClient {
     /**
-     * Do we make the ID of the client simple?
+     * Do we make the ID of the client gss.simple?
      */
     private Boolean simpleID = false;
 
@@ -109,7 +109,7 @@ class KryoNetClient extends SocketClient {
      * Uses the port and the ip
      * (ip=192.168.0.1,port=34527)
      * Simple ID = 19216801.34527
-     * Non simple ID =
+     * Non gss.simple ID =
      * 19216801.34527 -> 72543.10861291 -> kryo.72543.10861291 -> kry o.7 254 3.1 086 129 1 -> 1kry3.1o.7254086129
      * @return The string containing the ID of the connection.
      */

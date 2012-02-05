@@ -92,6 +92,27 @@ class QueueManager<T> {
     }
 
     /**
+     * Get the oldest item in the queue.
+     * @return The last item in the queue.
+     */
+    synchronized T getOldest() {
+        Session session = booter.getSession();
+        if (session != null) {
+            session.beginTransaction();
+            Criteria criteria = session.createCriteria(clasz);
+            criteria.addOrder(Order.desc("created"));
+            criteria.setMaxResults(1);
+            List ret = criteria.list();
+            session.close();
+            if (ret.size() > 0) {
+                T retV = (T) ret.get(0);
+                return retV;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Save an item.
      * @param object The item to save.
      */
@@ -132,6 +153,15 @@ class QueueManager<T> {
      */
     synchronized void unmark(T object) {
         Eval.x(object, "x.setRead(false);");
+        save(object);
+    }
+
+    /**
+     * Update when we were created to now.
+     * @param object An object to update the time created.
+     */
+    synchronized updateCreated(T object) {
+        Eval.x(object, "x.setCreated(System.currentTimeMillis());");
         save(object);
     }
 

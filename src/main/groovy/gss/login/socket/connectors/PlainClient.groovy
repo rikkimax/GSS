@@ -36,7 +36,7 @@ import org.apache.commons.lang.StringUtils
  */
 class PlainClient extends SocketClient {
     /**
-     * Do we make the ID of the client simple?
+     * Do we make the ID of the client gss.simple?
      */
     private Boolean simpleID = false;
 
@@ -109,7 +109,7 @@ class PlainClient extends SocketClient {
      * Uses the port and the ip
      * (ip=192.168.0.1,port=34527)
      * Simple ID = 19216801.34527
-     * Non simple ID =
+     * Non gss.simple ID =
      * 19216801.34527 -> 72543.10861291 -> plain.72543.10861291 -> pla in. 725 43. 108 612 91 -> 91pla43.in.725108612
      * @return The string containing the ID of the connection.
      */

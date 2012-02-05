@@ -27,14 +27,12 @@
 
 package gss.config
 
-import yaml.handling.Yaml2
-
+import com.esotericsoftware.kryo.Kryo
+import java.util.logging.Logger
 import org.apache.commons.vfs.FileObject
 import org.apache.commons.vfs.VFS
 import org.hibernate.cfg.AnnotationConfiguration
-import java.util.logging.Logger
-import com.esotericsoftware.kryo.Kryo
-import org.hibernate.ogm.cfg.OgmConfiguration
+import yaml.handling.Yaml2
 
 /**
  * The purpose of this class is to provide a means in which configuration of the GSS framework is defined and stored.
@@ -44,22 +42,22 @@ class Config {
     /**
      *  The working directory where the configuration files are present.
      */
-    private FileObject directory;
+    protected FileObject directory;
 
     /**
      * A list of servers to be used by this instance, created from configuration files.
      */
-    private ArrayList<gss.config.Server> servers;
+    protected ArrayList<gss.config.Server> servers;
 
     /**
      * Common data shared between server.
      */
-    private Map common;
+    protected Map common;
 
     /**
      * Annotation configuration for Hibernate for working with classes defined in configuration file.
      */
-    private AnnotationConfiguration annotationConfiguration;
+    protected AnnotationConfiguration annotationConfiguration;
 
     /**
      * Configuration for Hibernate OGM if used. For working with classes defined in configuration file.
@@ -70,12 +68,12 @@ class Config {
      * Kryo serializer to be used with KryoNet server connector.
      * Classes are loaded from configuration file and should be identifical to annotationConfiguration.
      */
-    private Kryo kryo;
+    protected Kryo kryo;
 
     /**
      * A list of serialized classes to use with e.g. Hibernate, Kryo.
      */
-    private List<String> serializedClasses;
+    protected List<String> serializedClasses;
 
     /**
      * Set the current working directory of the configuration files
